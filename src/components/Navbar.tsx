@@ -71,7 +71,7 @@ const Navbar = () => {
           >
             <User size={18} className="text-white group-hover:text-brand-orange transition-colors" />
           </Link>
-          <Link href="/book" className="flex items-center gap-2 bg-brand-orange text-black px-5 py-2 md:px-6 md:py-2.5 rounded-full font-bold uppercase tracking-tighter text-[10px] md:text-xs">
+          <Link href="/bookings" className="flex items-center gap-2 bg-brand-orange text-black px-5 py-2 md:px-6 md:py-2.5 rounded-full font-bold uppercase tracking-tighter text-[10px] md:text-xs">
             <CalendarDays size={16} />
             <span className="hidden md:block">Book Mobile</span>
             <span className="md:hidden">Book</span>
