@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
 const heroData = {
-  video: "https://assets.mixkit.co/videos/preview/mixkit-car-detailing-service-polishing-a-car-40113-large.mp4",
+  video: "https://assets.mixkit.co/videos/preview/mixkit-washing-a-luxury-car-with-a-pressure-water-gun-34048-large.mp4",
   image: "https://i.pinimg.com/1200x/cd/e5/3b/cde53b4246989d18ff20f63d5675a424.jpg",
   title: "Innovative Solutions\nFor Automobile",
   cta: "VIEW SERVICE",
