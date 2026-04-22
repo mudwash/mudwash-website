@@ -1,23 +1,39 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Heart } from 'lucide-react';
-
-const garages = [
-  {
-    name: 'Auto Precision Lab',
-    image: 'https://images.unsplash.com/photo-1486006920555-c77dcf18193c?ixlib=rb-4.0.3&auto=format&fit=crop&q=80&w=800',
-    distance: '2.5 km',
-  },
-  {
-    name: 'The Detail Shop',
-    image: 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366?ixlib=rb-4.0.3&auto=format&fit=crop&q=80&w=800',
-    distance: '3.1 km',
-  },
-];
+import { Heart, Loader2 } from 'lucide-react';
+import { getGarages, Garage } from '@/lib/garages';
 
 const NearbyGarages = () => {
+  const [garages, setGarages] = useState<Garage[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchGarages = async () => {
+      try {
+        const data = await getGarages();
+        setGarages(data);
+      } catch (error) {
+        console.error("Error fetching garages:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchGarages();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="py-20 flex flex-col items-center justify-center gap-4">
+        <Loader2 className="text-brand-orange animate-spin" size={32} />
+        <p className="text-white/20 text-xs font-black uppercase tracking-widest">Scanning Nearby Garages...</p>
+      </div>
+    );
+  }
+
+  if (garages.length === 0) return null;
+
   return (
     <section className="py-8 px-6 pb-32">
       <div className="flex justify-between items-center mb-6">
@@ -28,7 +44,7 @@ const NearbyGarages = () => {
       <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 snap-x">
         {garages.map((garage, index) => (
           <motion.div
-            key={index}
+            key={garage.id || index}
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             className="flex-shrink-0 w-[280px] bg-[#1A1A1A] rounded-[2rem] overflow-hidden border border-white/5 shadow-2xl snap-center group"
@@ -42,7 +58,10 @@ const NearbyGarages = () => {
             </div>
             <div className="p-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider">{garage.name}</h3>
+                <div className="flex flex-col">
+                  <h3 className="text-sm font-bold text-white uppercase tracking-wider">{garage.name}</h3>
+                  {garage.location && <span className="text-[9px] text-white/30 font-medium uppercase tracking-widest mt-0.5">{garage.location}</span>}
+                </div>
                 <span className="text-[10px] font-bold text-brand-orange">{garage.distance}</span>
               </div>
             </div>

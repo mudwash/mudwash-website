@@ -16,7 +16,8 @@ import {
   Search,
   Wrench,
   User,
-  Package
+  Package,
+  MapPin
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -25,6 +26,7 @@ const sidebarLinks = [
   { name: "Bookings", href: "/admin/bookings", icon: CalendarCheck },
   { name: "Services", href: "/admin/services", icon: Wrench },
   { name: "Parts", href: "/admin/parts", icon: Package },
+  { name: "Garages", href: "/admin/garages", icon: MapPin },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
