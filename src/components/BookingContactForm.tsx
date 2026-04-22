@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { Car, Droplet, Calendar, Clock, Timer, Receipt, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import { createBooking } from "@/lib/bookings";
 import { useRouter } from "next/navigation";
