@@ -84,6 +84,8 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!part) return;
+    
     setIsProcessing(true);
 
     const res = await loadRazorpay();
