@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Home, Settings, Calendar, User, CalendarDays, Wrench } from 'lucide-react';
 import gsap from 'gsap';
 import { usePathname } from 'next/navigation';
+import { auth } from '@/lib/firebase';
 
 const Navbar = () => {
   const topNavRef = useRef<HTMLElement>(null);
@@ -24,7 +25,15 @@ const Navbar = () => {
         ease: 'power4.out',
       });
     });
-    return () => ctx.revert();
+
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setIsLoggedIn(!!user);
+    });
+
+    return () => {
+      ctx.revert();
+      unsubscribe();
+    };
   }, []);
 
   const navLinks = [
@@ -40,7 +49,7 @@ const Navbar = () => {
       {/* TOP HEADER */}
       <nav
         ref={topNavRef}
-        className="fixed top-0 left-0 w-full z-50 px-6 py-4 flex justify-between items-center bg-[#0A0A0A]/40 backdrop-blur-3xl border-b border-white/10"
+        className="fixed top-0 left-0 w-full z-50 px-6 py-4 flex justify-between items-center bg-[#0A0A0A]/40 backdrop-blur-3xl border-b border-white/10 rounded-b-3xl"
       >
         <Link href="/" className="flex items-center gap-2 group">
           <div className="text-xl md:text-2xl font-black tracking-tighter flex items-baseline">

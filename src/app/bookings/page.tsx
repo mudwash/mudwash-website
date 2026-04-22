@@ -59,8 +59,14 @@ export default function BookingPage() {
 
   // Filter cars smoothly in-memory
   useEffect(() => {
-    if (!carQuery || !showCarDropdown) {
+    if (!showCarDropdown) {
       setCarSuggestions([]);
+      return;
+    }
+
+    if (!carQuery) {
+      // Show default suggestions when empty
+      setCarSuggestions(allCars.slice(0, 10));
       return;
     }
 

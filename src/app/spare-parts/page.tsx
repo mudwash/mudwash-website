@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState, Suspense } from "react";
 import { motion } from "framer-motion";
-import { Search, Filter, ShoppingCart, Star } from "lucide-react";
+import { Search, Filter, ShoppingCart, Star, Loader2 } from "lucide-react";
 import gsap from "gsap";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { auth } from "@/lib/firebase";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Suspense } from "react";
+import { getParts, Part } from "@/lib/parts";
 
 const spareParts = [
   {
@@ -73,6 +74,23 @@ function SparePartsContent() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
+  const [parts, setParts] = useState<Part[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchParts = async () => {
+      try {
+        const data = await getParts();
+        setParts(data);
+      } catch (error) {
+        console.error("Error fetching parts:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchParts();
+  }, []);
+
   const searchQuery = searchParams.get("search") || "";
   const activeCategory = searchParams.get("category") || "All Parts";
 
@@ -86,7 +104,7 @@ function SparePartsContent() {
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
-  const filteredParts = spareParts.filter((part) => {
+  const filteredParts = parts.filter((part) => {
     const matchesSearch = part.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = activeCategory === "All Parts" || part.category === activeCategory;
     return matchesSearch && matchesCategory;
@@ -175,52 +193,76 @@ function SparePartsContent() {
           </div>
 
           {/* Products Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-            {filteredParts.map((part, i) => (
-              <motion.div
-                key={part.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  delay: i * 0.1,
-                  duration: 0.8,
-                  ease: [0.23, 1, 0.32, 1],
-                }}
-                className="group relative"
-              >
-                {/* Card Body */}
-                <div className="relative bg-[#0a0a0a] border border-white/5 rounded-xl md:rounded-2xl overflow-hidden transition-all duration-500 h-full flex flex-col group">
-                  {/* Image Section */}
-                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-white/5">
-                    <img
-                      src={part.image}
-                      alt={part.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  {/* Hover highlight ring (matching ServicesGrid) */}
-                  <div className="absolute inset-0 border border-white/0 group-hover:border-white/20 transition-colors duration-500 pointer-events-none rounded-xl md:rounded-2xl z-30" />
-
-                  {/* Content Section */}
-                  <div className="p-3.5 sm:p-5 flex-1 flex flex-col justify-between">
-                    <div className="mb-3 sm:mb-4">
-                      <h3 className="text-xs sm:text-sm md:text-base font-black text-white leading-tight tracking-tight mb-1.5 sm:mb-2">
-                        {part.name}
-                      </h3>
-                      <div className="text-sm sm:text-base md:text-lg font-black text-brand-orange tracking-tighter">
-                        {part.price}
-                      </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="animate-spin text-brand-orange" size={32} />
+            </div>
+          ) : filteredParts.length === 0 ? (
+            <div className="text-center py-20 text-white/20">
+              <p>No parts found matching your criteria.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+              {filteredParts.map((part, i) => (
+                <motion.div
+                  key={part.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    delay: i * 0.1,
+                    duration: 0.8,
+                    ease: [0.23, 1, 0.32, 1],
+                  }}
+                  className="group relative"
+                >
+                  {/* Card Body */}
+                  <div 
+                    onClick={() => router.push(`/spare-parts/${part.id}`)}
+                    className="relative bg-[#0a0a0a] border border-white/5 rounded-xl md:rounded-2xl overflow-hidden transition-all duration-500 h-full flex flex-col group cursor-pointer"
+                  >
+                    {/* Image Section */}
+                    <div className="relative aspect-[4/3] w-full overflow-hidden bg-white/5">
+                      <img
+                        src={part.image}
+                        alt={part.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      />
                     </div>
 
-                    <motion.button className="w-full py-2.5 sm:py-4 bg-white text-black rounded-md sm:rounded font-black text-[8px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.2em] hover:bg-brand-orange transition-all duration-500 cursor-pointer">
-                      BOOK NOW
-                    </motion.button>
+                    {/* Hover highlight ring (matching ServicesGrid) */}
+                    <div className="absolute inset-0 border border-white/0 group-hover:border-white/20 transition-colors duration-500 pointer-events-none rounded-xl md:rounded-2xl z-30" />
+
+                    {/* Content Section */}
+                    <div className="p-3.5 sm:p-5 flex-1 flex flex-col justify-between">
+                      <div className="mb-3 sm:mb-4">
+                        <h3 className="text-xs sm:text-sm md:text-base font-black text-white leading-tight tracking-tight mb-1.5 sm:mb-2 group-hover:text-brand-orange transition-colors">
+                          {part.name}
+                        </h3>
+                        <div className="text-sm sm:text-base md:text-lg font-black text-brand-orange tracking-tighter">
+                          {part.price}
+                        </div>
+                      </div>
+
+                      <motion.button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const user = auth.currentUser;
+                          if (!user) {
+                            router.push(`/sign-in?returnTo=/checkout/${part.id}`);
+                          } else {
+                            router.push(`/checkout/${part.id}`);
+                          }
+                        }}
+                        className="w-full py-2.5 sm:py-4 bg-white text-black rounded-md sm:rounded font-black text-[8px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.2em] hover:bg-brand-orange transition-all duration-500 cursor-pointer relative z-40"
+                      >
+                        BOOK NOW
+                      </motion.button>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </main>
       <Footer />

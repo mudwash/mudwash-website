@@ -2,7 +2,10 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, Loader2, CheckCircle2 } from 'lucide-react';
+import { createBooking } from "@/lib/bookings";
+import { useRouter } from "next/navigation";
+import { auth } from "@/lib/firebase";
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -15,9 +18,26 @@ const BookingModal = ({ isOpen, onClose, serviceName }: BookingModalProps) => {
   const [carSuggestions, setCarSuggestions] = useState<string[]>([]);
   const [isSearchingCars, setIsSearchingCars] = useState(false);
   const [showCarDropdown, setShowCarDropdown] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const [allCars, setAllCars] = useState<string[]>([]);
+  const router = useRouter();
+
+  // Enforce login only after Firebase confirms user is not signed in
+  useEffect(() => {
+    if (isOpen) {
+      const unsubscribe = auth.onAuthStateChanged((user) => {
+        if (user === null) {
+          // Firebase has resolved and user is definitely not logged in
+          onClose();
+          router.push("/sign-in?returnTo=/services");
+        }
+      });
+      return () => unsubscribe();
+    }
+  }, [isOpen, router, onClose]);
 
   // Clear state on open/close
   useEffect(() => {
@@ -110,20 +130,63 @@ const BookingModal = ({ isOpen, onClose, serviceName }: BookingModalProps) => {
                 <X size={20} />
               </button>
 
-              <h2 className="text-xl md:text-2xl font-bold text-white mb-2 uppercase tracking-tight">Book Service</h2>
-              <p className="text-white/60 text-xs mb-6">
-                Provide your details below to schedule your <span className="text-brand-orange font-bold">{serviceName}</span> appointment.
-              </p>
+              {isSuccess ? (
+                <div className="py-12 flex flex-col items-center text-center space-y-6">
+                  <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-500">
+                    <CheckCircle2 size={32} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-2 uppercase">Success!</h3>
+                    <p className="text-white/60 text-xs px-6">Your booking for <span className="text-brand-orange">{serviceName}</span> has been received. We will contact you shortly.</p>
+                  </div>
+                  <button 
+                    onClick={() => { setIsSuccess(false); onClose(); }}
+                    className="text-brand-orange font-bold uppercase tracking-widest text-[10px] hover:underline pt-4"
+                  >
+                    Close Window
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <h2 className="text-xl md:text-2xl font-bold text-white mb-2 uppercase tracking-tight">Book Service</h2>
+                  <p className="text-white/60 text-xs mb-6">
+                    Provide your details below to schedule your <span className="text-brand-orange font-bold">{serviceName}</span> appointment.
+                  </p>
 
-              <form className="flex flex-col gap-4" onSubmit={(e) => { e.preventDefault(); onClose(); alert('Booking Confirmed!'); }}>
+                  <form 
+                    className="flex flex-col gap-4" 
+                    onSubmit={async (e) => { 
+                      e.preventDefault(); 
+                      const formData = new FormData(e.currentTarget);
+                      setIsSubmitting(true);
+                      try {
+                        await createBooking({
+                          customerName: formData.get("name") as string,
+                          phone: formData.get("phone") as string,
+                          email: "", // Not in modal but in Firestore schema
+                          service: serviceName,
+                          date: new Date().toLocaleDateString(), // Mock for now
+                          time: "ASAP",
+                          location: "Mobile Detailing",
+                          amount: "AED 0",
+                          status: "Pending"
+                        });
+                        setIsSuccess(true);
+                      } catch (err) {
+                        console.error(err);
+                      } finally {
+                        setIsSubmitting(false);
+                      }
+                    }}
+                  >
                 <div>
                   <label className="block text-[10px] text-white/40 uppercase tracking-wider mb-1 px-1">Full Name</label>
-                  <input type="text" placeholder="John Doe" className="w-full bg-[#1A1A1A] border border-white/5 text-white px-4 py-3 text-sm focus:outline-none focus:border-brand-orange/50 transition-colors" required />
+                  <input name="name" type="text" placeholder="John Doe" className="w-full bg-[#1A1A1A] border border-white/5 text-white px-4 py-3 text-sm focus:outline-none focus:border-brand-orange/50 transition-colors" required />
                 </div>
                 
                 <div>
                   <label className="block text-[10px] text-white/40 uppercase tracking-wider mb-1 px-1">Phone Number</label>
-                  <input type="tel" placeholder="+1 (555) 000-0000" className="w-full bg-[#1A1A1A] border border-white/5 text-white px-4 py-3 text-sm focus:outline-none focus:border-brand-orange/50 transition-colors" required />
+                  <input name="phone" type="tel" placeholder="+1 (555) 000-0000" className="w-full bg-[#1A1A1A] border border-white/5 text-white px-4 py-3 text-sm focus:outline-none focus:border-brand-orange/50 transition-colors" required />
                 </div>
 
                 <div className="relative" ref={dropdownRef}>
@@ -176,11 +239,17 @@ const BookingModal = ({ isOpen, onClose, serviceName }: BookingModalProps) => {
                 </div>
 
                 <div className="mt-2">
-                  <button type="submit" className="w-full bg-brand-orange hover:bg-white text-black font-bold uppercase tracking-wider text-xs px-6 py-4 transition-colors">
-                    Confirm Booking
+                  <button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                    className="w-full bg-brand-orange hover:bg-white text-black font-bold uppercase tracking-wider text-xs px-6 py-4 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    {isSubmitting ? <Loader2 className="animate-spin" size={16} /> : "Confirm Booking"}
                   </button>
                 </div>
               </form>
+              </>
+              )}
             </motion.div>
           </div>
         </>

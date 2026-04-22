@@ -5,6 +5,8 @@ import { motion, Variants } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BookingModal from "@/components/BookingModal";
+import { useRouter } from "next/navigation";
+import { auth } from "@/lib/firebase";
 
 const allServicesData = [
   {
@@ -137,6 +139,7 @@ const itemVariants: Variants = {
 export default function ServicesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedService, setSelectedService] = useState("");
+  const router = useRouter();
 
   return (
     <>
@@ -167,8 +170,13 @@ export default function ServicesPage() {
                   variants={itemVariants}
                   className="relative aspect-[4/3] rounded bg-[#1A1A1A] overflow-hidden group cursor-pointer"
                   onClick={() => {
-                    setSelectedService(service.name);
-                    setIsModalOpen(true);
+                    const user = auth.currentUser;
+                    if (!user) {
+                      router.push("/sign-in?returnTo=/services");
+                    } else {
+                      setSelectedService(service.name);
+                      setIsModalOpen(true);
+                    }
                   }}
                 >
                   {/* Background Image */}

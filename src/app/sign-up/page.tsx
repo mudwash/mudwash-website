@@ -3,10 +3,74 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, User, Loader2 } from "lucide-react";
+import { auth } from "@/lib/firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+import { saveUserToFirestore } from "@/lib/users";
 
 export default function SignUpPage() {
+  return (
+    <Suspense fallback={<div className="h-screen bg-[#050505]" />}>
+      <SignUpContent />
+    </Suspense>
+  );
+}
+
+function SignUpContent() {
   const [showPassword, setShowPassword] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo");
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsSubmitting(true);
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // Save user to Firestore
+      if (userCredential.user) {
+        await updateProfile(userCredential.user, {
+          displayName: name
+        });
+
+        await saveUserToFirestore({
+          uid: userCredential.user.uid,
+          name: name,
+          email: email,
+          createdAt: new Date().toISOString()
+        });
+      }
+
+      const isAdmin = userCredential.user?.email === "wazeert13@gmail.com";
+
+      if (isAdmin) {
+        localStorage.setItem("admin_token", "mudwash_session_active");
+        router.push(returnTo || "/admin");
+      } else {
+        router.push(returnTo || "/");
+      }
+    } catch (err: any) {
+      console.error(err);
+      if (err.code === "auth/email-already-in-use") {
+        setError("This email is already registered. Please sign in.");
+      } else {
+        setError("Failed to create account. Please try again.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <main className="h-screen w-full bg-[#050505] text-white flex overflow-hidden">
@@ -42,7 +106,16 @@ export default function SignUpPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
           >
-            <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+            <form className="space-y-5" onSubmit={handleSignUp}>
+              {error && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="bg-red-500/10 border border-red-500/20 text-red-500 text-xs py-3 px-4 rounded-lg font-bold"
+                >
+                  {error}
+                </motion.div>
+              )}
               
               {/* Name Input */}
               <div className="relative group">
@@ -52,6 +125,8 @@ export default function SignUpPage() {
                 <input
                   type="text"
                   id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   className="w-full bg-transparent border-b border-white/10 py-3 pl-9 pr-4 text-white md:text-lg focus:outline-none focus:border-brand-orange transition-all placeholder:text-white/20"
                   placeholder="Full Name"
                   required
@@ -66,6 +141,8 @@ export default function SignUpPage() {
                 <input
                   type="email"
                   id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-transparent border-b border-white/10 py-3 pl-9 pr-4 text-white md:text-lg focus:outline-none focus:border-brand-orange transition-all placeholder:text-white/20"
                   placeholder="Email Address"
                   required
@@ -80,6 +157,8 @@ export default function SignUpPage() {
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-transparent border-b border-white/10 py-3 pl-9 pr-12 text-white md:text-lg focus:outline-none focus:border-brand-orange transition-all placeholder:text-white/20"
                   placeholder="Password"
                   required
@@ -96,9 +175,15 @@ export default function SignUpPage() {
               <div className="pt-6">
                 <button
                   type="submit"
-                  className="w-full bg-white text-black font-extrabold uppercase tracking-widest text-xs py-5 rounded-none hover:bg-brand-orange transition-all duration-300"
+                  disabled={isSubmitting}
+                  className="w-full bg-white text-black font-extrabold uppercase tracking-widest text-xs py-5 rounded-none hover:bg-brand-orange transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  Create Account
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Creating Account...
+                    </>
+                  ) : "Create Account"}
                 </button>
               </div>
             </form>
