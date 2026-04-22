@@ -28,4 +28,4 @@ try {
   console.warn("Firebase initialization warning:", error);
 }
 
-export { app, auth!, db!, storage! };
+export { app, auth, db, storage };
