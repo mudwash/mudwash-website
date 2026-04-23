@@ -13,8 +13,23 @@ export default function InstallPWA() {
       setIsInstalled(true);
     }
 
+    const checkPrompt = () => {
+      if ((window as any).deferredPrompt) {
+        setDeferredPrompt((window as any).deferredPrompt);
+        setIsInstallable(true);
+      }
+    };
+
+    // Check immediately if event fired before hydration
+    checkPrompt();
+    
+    // Poll for a short time to catch delayed event
+    const interval = setInterval(checkPrompt, 500);
+    setTimeout(() => clearInterval(interval), 5000);
+
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
+      (window as any).deferredPrompt = e;
       setDeferredPrompt(e);
       setIsInstallable(true);
     };
@@ -25,10 +40,12 @@ export default function InstallPWA() {
       setIsInstalled(true);
       setIsInstallable(false);
       setDeferredPrompt(null);
+      (window as any).deferredPrompt = null;
     });
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      clearInterval(interval);
     };
   }, []);
 
@@ -40,6 +57,7 @@ export default function InstallPWA() {
       setIsInstallable(false);
     }
     setDeferredPrompt(null);
+    (window as any).deferredPrompt = null;
   };
 
   if (!isInstallable || isInstalled) return null;
