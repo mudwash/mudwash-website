@@ -21,7 +21,12 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "MUDWASH",
   },
+  icons: {
+    icon: "/icon-192x192.png",
+    apple: "/icon-192x192.png",
+  },
 };
+
 
 export const viewport = {
   themeColor: "#f69621",

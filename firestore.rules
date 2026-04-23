@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if the user is an admin
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == 'wazeert13@gmail.com';
+    }
+
+    // Garages: Public read, Admin write
+    match /garages/{garageId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Parts: Public read, Admin write
+    match /parts/{partId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Services: Public read, Admin write
+    match /services/{serviceId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Bookings: Admin can do anything, Users can read/write their own
+    match /bookings/{bookingId} {
+      allow read: if isAdmin() || (request.auth != null && request.auth.token.email == resource.data.email);
+      allow create: if true; // Allow anyone to create a booking, or restrict to logged in users if preferred
+      allow update, delete: if isAdmin();
+    }
+
+    // Users: Users can read/write their own profiles, Admin can read all
+    match /users/{userId} {
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == userId);
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

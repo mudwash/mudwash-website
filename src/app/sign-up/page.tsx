@@ -37,31 +37,30 @@ function SignUpContent() {
 
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      
-      // Save user to Firestore
-      if (userCredential.user) {
-        await updateProfile(userCredential.user, {
-          displayName: name
-        });
+      const user = userCredential.user;
 
-        await saveUserToFirestore({
-          uid: userCredential.user.uid,
-          name: name,
-          email: email,
-          createdAt: new Date().toISOString()
-        });
-      }
+      if (user) {
+        // Update profile and save to Firestore in parallel for performance
+        await Promise.all([
+          updateProfile(user, { displayName: name }),
+          saveUserToFirestore({
+            uid: user.uid,
+            name: name,
+            email: email,
+            createdAt: new Date().toISOString(),
+          })
+        ]);
 
-      const isAdmin = userCredential.user?.email === "wazeert13@gmail.com";
-
-      if (isAdmin) {
-        localStorage.setItem("admin_token", "mudwash_session_active");
-        router.push(returnTo || "/admin");
-      } else {
-        router.push(returnTo || "/");
+        const isAdmin = user.email === "wazeert13@gmail.com";
+        if (isAdmin) {
+          localStorage.setItem("admin_token", "mudwash_session_active");
+          router.push(returnTo || "/admin");
+        } else {
+          router.push(returnTo || "/");
+        }
       }
     } catch (err: any) {
-      console.error(err);
+      console.error("Sign up error:", err);
       if (err.code === "auth/email-already-in-use") {
         setError("This email is already registered. Please sign in.");
       } else {
@@ -71,6 +70,7 @@ function SignUpContent() {
       setIsSubmitting(false);
     }
   };
+
 
   return (
     <main className="h-screen w-full bg-[#050505] text-white flex overflow-hidden">

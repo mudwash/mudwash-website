@@ -22,11 +22,13 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { auth } from "@/lib/firebase";
 import { getUserProfile, UserProfile } from "@/lib/users";
+import { getUserBookings, Booking } from "@/lib/bookings";
 import { signOut } from "firebase/auth";
 
 export default function ProfilePage() {
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'orders' | 'settings'>('overview');
 
@@ -35,19 +37,28 @@ export default function ProfilePage() {
       if (!user) {
         router.push("/sign-in?returnTo=/profile");
       } else {
-        const data = await getUserProfile(user.uid);
-        if (data) {
-          setProfile(data);
-        } else {
-          // If no profile in Firestore, create a basic one from auth
-          setProfile({
-            uid: user.uid,
-            name: user.displayName || "Member",
-            email: user.email || "",
-            createdAt: new Date().toISOString()
-          });
+        try {
+          const [profileData, bookingsData] = await Promise.all([
+            getUserProfile(user.uid),
+            getUserBookings(user.email || "")
+          ]);
+
+          if (profileData) {
+            setProfile(profileData);
+          } else {
+            setProfile({
+              uid: user.uid,
+              name: user.displayName || "Member",
+              email: user.email || "",
+              createdAt: new Date().toISOString()
+            });
+          }
+          setBookings(bookingsData);
+        } catch (error) {
+          console.error("Error loading profile data:", error);
+        } finally {
+          setLoading(false);
         }
-        setLoading(false);
       }
     });
 
@@ -55,10 +66,15 @@ export default function ProfilePage() {
   }, [router]);
 
   const handleLogout = async () => {
-    await signOut(auth);
-    localStorage.removeItem("admin_token");
-    router.push("/");
+    try {
+      await signOut(auth);
+      localStorage.removeItem("admin_token");
+      router.push("/");
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
   };
+
 
   if (loading) {
     return (
@@ -79,13 +95,33 @@ export default function ProfilePage() {
           <div className="w-full lg:w-80 space-y-8">
             <div className="bg-[#0A0A0A] border border-white/5 rounded-[2rem] p-8 space-y-8">
               <div className="flex flex-col items-center text-center space-y-4">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-brand-orange to-brand-orange/20 flex items-center justify-center text-black border-4 border-[#0A0A0A] shadow-2xl relative group">
-                  <span className="text-4xl font-black">{profile?.name.charAt(0)}</span>
+                <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-brand-orange to-brand-orange/20 flex items-center justify-center text-black border-4 border-[#0A0A0A] shadow-2xl relative group overflow-hidden">
+                  <span className="text-4xl font-black">
+                    {profile?.name ? profile.name.charAt(0).toUpperCase() : profile?.email?.charAt(0).toUpperCase() || 'M'}
+                  </span>
                   <div className="absolute inset-0 rounded-full border border-white/10 group-hover:border-brand-orange transition-colors" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-black uppercase tracking-tight">{profile?.name}</h1>
-                  <p className="text-white/40 text-xs font-bold uppercase tracking-widest mt-1">Mudwash Member</p>
+                  <h1 className="text-xl font-black uppercase tracking-tight mb-2">
+                    {profile?.name || profile?.email?.split('@')[0] || "Valued Member"}
+                  </h1>
+                  <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] bg-white/5 inline-block px-3 py-1 rounded-full border border-white/10">
+                    Mudwash Member
+                  </p>
+                  
+                  {/* Additional Real Data in Sidebar */}
+                  <div className="flex flex-col items-center gap-1.5 mt-4">
+                    <div className="flex items-center gap-2 text-white/60 text-xs font-medium">
+                      <Mail size={12} className="text-brand-orange" />
+                      <span>{profile?.email || "No Email Provided"}</span>
+                    </div>
+                    {profile?.phone && (
+                      <div className="flex items-center gap-2 text-white/60 text-xs font-medium">
+                        <Phone size={12} className="text-brand-orange" />
+                        <span>{profile.phone}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -160,7 +196,9 @@ export default function ProfilePage() {
                       <div>
                         <p className="text-black/40 text-[10px] font-black uppercase tracking-widest mb-1">Total Bookings</p>
                         <div className="flex items-end justify-between">
-                          <p className="text-5xl font-black tracking-tighter">04</p>
+                          <p className="text-5xl font-black tracking-tighter">
+                            {bookings.length.toString().padStart(2, '0')}
+                          </p>
                           <button 
                             onClick={() => setActiveTab('orders')}
                             className="bg-black text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-colors"
@@ -223,22 +261,62 @@ export default function ProfilePage() {
                   exit={{ opacity: 0, y: -20 }}
                   className="bg-[#0A0A0A] border border-white/5 rounded-[2rem] p-8 md:p-10"
                 >
-                  <h2 className="text-2xl font-black uppercase tracking-tight mb-8">Recent Orders</h2>
+                  <h2 className="text-2xl font-black uppercase tracking-tight mb-8">Booking History</h2>
                   <div className="space-y-4">
-                    {/* Placeholder for real orders */}
-                    <div className="text-center py-20 border-2 border-dashed border-white/5 rounded-3xl">
-                      <Package size={40} className="mx-auto text-white/10 mb-4" />
-                      <p className="text-white/20 font-bold uppercase tracking-widest text-[10px]">Your order history is empty</p>
-                      <button 
-                        onClick={() => router.push('/spare-parts')}
-                        className="mt-6 text-brand-orange hover:underline text-xs font-black uppercase tracking-widest"
-                      >
-                        Browse Parts
-                      </button>
-                    </div>
+                    {bookings.length === 0 ? (
+                      <div className="text-center py-20 border-2 border-dashed border-white/5 rounded-3xl">
+                        <Package size={40} className="mx-auto text-white/10 mb-4" />
+                        <p className="text-white/20 font-bold uppercase tracking-widest text-[10px]">Your booking history is empty</p>
+                        <button 
+                          onClick={() => router.push('/')}
+                          className="mt-6 text-brand-orange hover:underline text-xs font-black uppercase tracking-widest"
+                        >
+                          Book a Service
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="grid gap-4">
+                        {bookings.map((booking) => (
+                          <div 
+                            key={booking.id}
+                            className="bg-white/[0.02] border border-white/5 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-white/[0.04] transition-all group"
+                          >
+                            <div className="flex items-center gap-6">
+                              <div className="w-16 h-16 bg-white/5 rounded-xl flex items-center justify-center text-brand-orange group-hover:scale-110 transition-transform">
+                                <Calendar size={24} />
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h4 className="font-black uppercase tracking-tight text-white">{booking.service}</h4>
+                                  <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${
+                                    booking.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
+                                    booking.status === 'Pending' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
+                                    'bg-red-500/10 text-red-500 border-red-500/20'
+                                  }`}>
+                                    {booking.status}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-4 text-white/40 text-[10px] font-bold uppercase tracking-widest">
+                                  <span className="flex items-center gap-1.5"><Clock size={12} /> {booking.date} @ {booking.time}</span>
+                                  <span className="flex items-center gap-1.5"><MapPin size={12} /> {booking.location}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-between md:justify-end gap-8 pt-4 md:pt-0 border-t md:border-t-0 border-white/5">
+                              <div className="text-right">
+                                <p className="text-white/20 text-[10px] font-black uppercase tracking-widest mb-1">Amount Paid</p>
+                                <p className="text-xl font-black text-brand-orange tracking-tighter">{booking.amount}</p>
+                              </div>
+                              <ChevronRight className="text-white/20 group-hover:text-brand-orange group-hover:translate-x-1 transition-all" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}
+
 
               {activeTab === 'settings' && (
                 <motion.div
