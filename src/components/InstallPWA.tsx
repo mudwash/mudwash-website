@@ -8,8 +8,10 @@ export default function InstallPWA() {
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
 
+  const [showModal, setShowModal] = useState(false);
+
   useEffect(() => {
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    if (window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true) {
       setIsInstalled(true);
     }
 
@@ -20,10 +22,7 @@ export default function InstallPWA() {
       }
     };
 
-    // Check immediately if event fired before hydration
     checkPrompt();
-    
-    // Poll for a short time to catch delayed event
     const interval = setInterval(checkPrompt, 500);
     setTimeout(() => clearInterval(interval), 5000);
 
@@ -50,25 +49,62 @@ export default function InstallPWA() {
   }, []);
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      setIsInstallable(false);
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setIsInstallable(false);
+      }
+      setDeferredPrompt(null);
+      (window as any).deferredPrompt = null;
+    } else {
+      // If no native prompt is available (e.g. iOS Safari), show instructions
+      setShowModal(true);
     }
-    setDeferredPrompt(null);
-    (window as any).deferredPrompt = null;
   };
 
-  if (!isInstallable || isInstalled) return null;
+  if (isInstalled) return null;
 
   return (
-    <button
-      onClick={handleInstallClick}
-      className="hidden md:flex items-center gap-2 bg-white/10 text-white hover:bg-white hover:text-black px-4 py-2 rounded-full font-bold uppercase tracking-widest text-[10px] transition-all"
-    >
-      <Download size={14} />
-      <span>Install App</span>
-    </button>
+    <>
+      <button
+        onClick={handleInstallClick}
+        className="flex items-center gap-2 bg-white/10 text-white hover:bg-white hover:text-black px-3 py-2 md:px-4 md:py-2.5 rounded-full font-bold uppercase tracking-widest text-[9px] md:text-[10px] transition-all whitespace-nowrap"
+      >
+        <Download size={14} />
+        <span>Install App</span>
+      </button>
+
+      {/* iOS / Manual Install Instructions Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-[#111111] border border-white/10 rounded-[2rem] p-8 max-w-sm w-full text-center space-y-6">
+            <div className="w-16 h-16 bg-brand-orange/10 rounded-full flex items-center justify-center mx-auto text-brand-orange">
+              <Download size={32} />
+            </div>
+            
+            <div>
+              <h3 className="text-xl font-bold text-white mb-2">Install MUDWASH</h3>
+              <p className="text-white/60 text-sm leading-relaxed">
+                To install this app on your device:
+              </p>
+            </div>
+            
+            <div className="bg-white/5 rounded-2xl p-4 text-left space-y-3 border border-white/5">
+              <p className="text-sm text-white/80 flex gap-3"><strong className="text-brand-orange">1.</strong> Tap the <strong>Share</strong> icon in your browser menu.</p>
+              <p className="text-sm text-white/80 flex gap-3"><strong className="text-brand-orange">2.</strong> Scroll down and tap <strong>"Add to Home Screen"</strong>.</p>
+              <p className="text-sm text-white/80 flex gap-3"><strong className="text-brand-orange">3.</strong> Tap <strong>Add</strong> in the top right corner.</p>
+            </div>
+
+            <button 
+              onClick={() => setShowModal(false)}
+              className="w-full bg-brand-orange text-black font-bold uppercase tracking-widest text-xs py-4 rounded-xl hover:bg-white transition-colors"
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
