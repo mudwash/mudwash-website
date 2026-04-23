@@ -8,6 +8,8 @@ import gsap from 'gsap';
 import { usePathname } from 'next/navigation';
 import { auth } from '@/lib/firebase';
 
+import InstallPWA from './InstallPWA';
+
 const Navbar = () => {
   const topNavRef = useRef<HTMLElement>(null);
   const bottomNavRef = useRef<HTMLDivElement>(null);
@@ -74,6 +76,7 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-3">
+          <InstallPWA />
           <Link 
             href={isLoggedIn ? "/profile" : "/sign-up"} 
             className="hidden md:flex items-center justify-center w-10 h-10 rounded-full border border-white/10 hover:border-brand-orange/50 hover:bg-brand-orange/10 transition-all group"

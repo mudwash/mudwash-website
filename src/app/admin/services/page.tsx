@@ -12,13 +12,14 @@ import {
   Loader2,
   Image as ImageIcon
 } from "lucide-react";
-import { getServices, addService, deleteService, Service } from "@/lib/services";
+import { getServices, addService, updateService, deleteService, Service } from "@/lib/services";
 
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   // Form State
   const [formData, setFormData] = useState<Service>({
@@ -46,24 +47,33 @@ export default function ServicesPage() {
     }
   };
 
+  const handleAddNew = () => {
+    setEditingId(null);
+    setFormData({
+      name: "", price: "", duration: "", category: "Full Service", description: "", image: "", active: true
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (service: Service) => {
+    setEditingId(service.id!);
+    setFormData(service);
+    setIsModalOpen(true);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await addService(formData);
+      if (editingId) {
+        await updateService(editingId, formData);
+      } else {
+        await addService(formData);
+      }
       setIsModalOpen(false);
-      setFormData({
-        name: "",
-        price: "",
-        duration: "",
-        category: "Full Service",
-        description: "",
-        image: "",
-        active: true
-      });
       fetchServices();
     } catch (error) {
-      console.error("Error adding service:", error);
+      console.error("Error saving service:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -80,6 +90,35 @@ export default function ServicesPage() {
     }
   };
 
+  const handleSeed = async () => {
+    if (!confirm("This will import the 12 default services into the database. Proceed?")) return;
+    setIsSubmitting(true);
+    const defaults = [
+      { name: "General Service", image: "https://i.pinimg.com/1200x/c6/cc/8a/c6cc8afcad09287f9b6356bd19e6f081.jpg", category: "general", price: "AED 150", duration: "1 Hour", description: "Standard service", active: true },
+      { name: "Oil Change", image: "https://i.pinimg.com/1200x/c4/98/2c/c4982cc85c46a58e4f00bd9bf53284e2.jpg", category: "general", price: "AED 100", duration: "30 Min", description: "Oil and filter change", active: true },
+      { name: "Battery Replacement", image: "https://i.pinimg.com/1200x/30/25/a4/3025a43cd85187ae9fd71dbf592cfd51.jpg", category: "general", price: "AED 350", duration: "30 Min", description: "New battery installation", active: true },
+      { name: "Brake Service", image: "https://i.pinimg.com/1200x/06/2d/b3/062db3d9baaf58a130130ecd701f24ee.jpg", category: "general", price: "AED 250", duration: "1.5 Hours", description: "Brake pad replacement", active: true },
+      { name: "AC Check & Gas", image: "https://i.pinimg.com/1200x/96/2c/04/962c041629bf7d3016003bb6b4c1d925.jpg", category: "general", price: "AED 120", duration: "45 Min", description: "AC gas refill and check", active: true },
+      { name: "Premium Wash", image: "https://i.pinimg.com/1200x/1d/cf/8f/1dcf8f3a2fefeb9637eabe516b5574a6.jpg", category: "general", price: "AED 80", duration: "45 Min", description: "Deep cleaning wash", active: true },
+      { name: "Engine Tuning", image: "https://i.pinimg.com/1200x/84/38/d5/8438d5f961cd837c4f72fa7a06a325d0.jpg", category: "general", price: "AED 300", duration: "2 Hours", description: "Complete engine tune-up", active: true },
+      { name: "Suspension", image: "https://i.pinimg.com/736x/e9/a2/78/e9a278f93e8aa08785a7754326648499.jpg", category: "general", price: "AED 400", duration: "3 Hours", description: "Suspension check and fix", active: true },
+      { name: "Alignment Checking", image: "https://i.pinimg.com/736x/b9/58/04/b9580485cedc42c46c86b0c90b51fe52.jpg", category: "general", price: "AED 100", duration: "30 Min", description: "Wheel alignment", active: true },
+      { name: "Paint & Body", image: "https://i.pinimg.com/1200x/e4/d6/7b/e4d67b9a3b80fc6c17da4a454f637ef8.jpg", category: "general", price: "Contact Us", duration: "Varies", description: "Bodywork and paint", active: true },
+      { name: "Inspections", image: "https://i.pinimg.com/1200x/35/04/9b/35049b606164092c08061836981df2e0.jpg", category: "general", price: "AED 150", duration: "1 Hour", description: "Full car inspection", active: true },
+      { name: "Ceramic Coating", image: "https://i.pinimg.com/1200x/d6/4a/6a/d64a6a6fdc465a152d31359fe2a995e6.jpg", category: "detailing", price: "AED 1200", duration: "1 Day", description: "Premium ceramic coating", active: true },
+    ];
+    try {
+      for (const service of defaults) {
+        await addService(service);
+      }
+      fetchServices();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="space-y-8 pb-12">
       {/* Header */}
@@ -88,13 +127,22 @@ export default function ServicesPage() {
           <h1 className="text-3xl font-bold mb-2">Services</h1>
           <p className="text-white/40 text-sm font-medium">Configure your washing plans and detailing packages.</p>
         </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="bg-brand-orange text-black px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-white transition-colors"
-        >
-          <Plus size={18} />
-          <span>Add Service</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={handleSeed}
+            disabled={isSubmitting}
+            className="bg-white/10 text-white px-4 py-3 rounded-xl font-bold text-sm hover:bg-white/20 transition-colors"
+          >
+            Import Default Services
+          </button>
+          <button 
+            onClick={handleAddNew}
+            className="bg-brand-orange text-black px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-white transition-colors"
+          >
+            <Plus size={18} />
+            <span>Add Service</span>
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -145,7 +193,10 @@ export default function ServicesPage() {
                 </div>
 
                 <div className="flex gap-3 pt-4">
-                  <button className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold transition-all">
+                  <button 
+                    onClick={() => handleEdit(service)}
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold transition-all"
+                  >
                     <Edit2 size={14} /> Edit
                   </button>
                   <button 
@@ -161,7 +212,7 @@ export default function ServicesPage() {
 
           {/* Add New Placeholder Card */}
           <motion.button 
-            onClick={() => setIsModalOpen(true)}
+            onClick={handleAddNew}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
