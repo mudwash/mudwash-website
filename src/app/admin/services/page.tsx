@@ -10,7 +10,17 @@ import {
   MoreVertical,
   X,
   Loader2,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Clock,
+  Droplets, 
+  Zap, 
+  Snowflake, 
+  Waves, 
+  Wrench, 
+  Settings, 
+  Disc, 
+  Car,
+  ShieldCheck
 } from "lucide-react";
 import { getServices, addService, updateService, deleteService, Service } from "@/lib/services";
 
@@ -29,6 +39,7 @@ export default function ServicesPage() {
     category: "Full Service",
     description: "",
     image: "",
+    icon: "Wrench",
     active: true
   });
 
@@ -50,7 +61,7 @@ export default function ServicesPage() {
   const handleAddNew = () => {
     setEditingId(null);
     setFormData({
-      name: "", price: "", duration: "", category: "Full Service", description: "", image: "", active: true
+      name: "", price: "", duration: "", category: "Full Service", description: "", image: "", icon: "Wrench", active: true
     });
     setIsModalOpen(true);
   };
@@ -94,18 +105,18 @@ export default function ServicesPage() {
     if (!confirm("This will import the 12 default services into the database. Proceed?")) return;
     setIsSubmitting(true);
     const defaults = [
-      { name: "General Service", image: "https://i.pinimg.com/1200x/c6/cc/8a/c6cc8afcad09287f9b6356bd19e6f081.jpg", category: "general", price: "AED 150", duration: "1 Hour", description: "Standard service", active: true },
-      { name: "Oil Change", image: "https://i.pinimg.com/1200x/c4/98/2c/c4982cc85c46a58e4f00bd9bf53284e2.jpg", category: "general", price: "AED 100", duration: "30 Min", description: "Oil and filter change", active: true },
-      { name: "Battery Replacement", image: "https://i.pinimg.com/1200x/30/25/a4/3025a43cd85187ae9fd71dbf592cfd51.jpg", category: "general", price: "AED 350", duration: "30 Min", description: "New battery installation", active: true },
-      { name: "Brake Service", image: "https://i.pinimg.com/1200x/06/2d/b3/062db3d9baaf58a130130ecd701f24ee.jpg", category: "general", price: "AED 250", duration: "1.5 Hours", description: "Brake pad replacement", active: true },
-      { name: "AC Check & Gas", image: "https://i.pinimg.com/1200x/96/2c/04/962c041629bf7d3016003bb6b4c1d925.jpg", category: "general", price: "AED 120", duration: "45 Min", description: "AC gas refill and check", active: true },
-      { name: "Premium Wash", image: "https://i.pinimg.com/1200x/1d/cf/8f/1dcf8f3a2fefeb9637eabe516b5574a6.jpg", category: "general", price: "AED 80", duration: "45 Min", description: "Deep cleaning wash", active: true },
-      { name: "Engine Tuning", image: "https://i.pinimg.com/1200x/84/38/d5/8438d5f961cd837c4f72fa7a06a325d0.jpg", category: "general", price: "AED 300", duration: "2 Hours", description: "Complete engine tune-up", active: true },
-      { name: "Suspension", image: "https://i.pinimg.com/736x/e9/a2/78/e9a278f93e8aa08785a7754326648499.jpg", category: "general", price: "AED 400", duration: "3 Hours", description: "Suspension check and fix", active: true },
-      { name: "Alignment Checking", image: "https://i.pinimg.com/736x/b9/58/04/b9580485cedc42c46c86b0c90b51fe52.jpg", category: "general", price: "AED 100", duration: "30 Min", description: "Wheel alignment", active: true },
-      { name: "Paint & Body", image: "https://i.pinimg.com/1200x/e4/d6/7b/e4d67b9a3b80fc6c17da4a454f637ef8.jpg", category: "general", price: "Contact Us", duration: "Varies", description: "Bodywork and paint", active: true },
-      { name: "Inspections", image: "https://i.pinimg.com/1200x/35/04/9b/35049b606164092c08061836981df2e0.jpg", category: "general", price: "AED 150", duration: "1 Hour", description: "Full car inspection", active: true },
-      { name: "Ceramic Coating", image: "https://i.pinimg.com/1200x/d6/4a/6a/d64a6a6fdc465a152d31359fe2a995e6.jpg", category: "detailing", price: "AED 1200", duration: "1 Day", description: "Premium ceramic coating", active: true },
+      { name: "General Service", icon: "Wrench", image: "", category: "general", price: "AED 150", duration: "1 Hour", description: "Standard service", active: true },
+      { name: "Oil Change", icon: "Droplets", image: "", category: "general", price: "AED 100", duration: "30 Min", description: "Oil and filter change", active: true },
+      { name: "Battery Replacement", icon: "Zap", image: "", category: "general", price: "AED 350", duration: "30 Min", description: "New battery installation", active: true },
+      { name: "Brake Service", icon: "Disc", image: "", category: "general", price: "AED 250", duration: "1.5 Hours", description: "Brake pad replacement", active: true },
+      { name: "AC Check & Gas", icon: "Snowflake", image: "", category: "general", price: "AED 120", duration: "45 Min", description: "AC gas refill and check", active: true },
+      { name: "Premium Wash", icon: "Waves", image: "", category: "general", price: "AED 80", duration: "45 Min", description: "Deep cleaning wash", active: true },
+      { name: "Engine Tuning", icon: "Settings", image: "", category: "general", price: "AED 300", duration: "2 Hours", description: "Complete engine tune-up", active: true },
+      { name: "Suspension", icon: "Wrench", image: "", category: "general", price: "AED 400", duration: "3 Hours", description: "Suspension check and fix", active: true },
+      { name: "Alignment Checking", icon: "Wrench", image: "", category: "general", price: "AED 100", duration: "30 Min", description: "Wheel alignment", active: true },
+      { name: "Paint & Body", icon: "ShieldCheck", image: "", category: "general", price: "Contact Us", duration: "Varies", description: "Bodywork and paint", active: true },
+      { name: "Inspections", icon: "Wrench", image: "", category: "general", price: "AED 150", duration: "1 Hour", description: "Full car inspection", active: true },
+      { name: "Ceramic Coating", icon: "ShieldCheck", image: "", category: "detailing", price: "AED 1200", duration: "1 Day", description: "Premium ceramic coating", active: true },
     ];
     try {
       for (const service of defaults) {
@@ -159,15 +170,31 @@ export default function ServicesPage() {
               transition={{ delay: idx * 0.1 }}
               className="bg-[#0A0A0A] border border-white/5 rounded-2xl overflow-hidden group hover:border-white/10 transition-colors relative flex flex-col"
             >
-              {/* Image Preview */}
-              <div className="h-40 bg-white/5 relative">
-                {service.image ? (
-                  <img src={service.image} alt={service.name} className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-white/10">
-                    <ImageIcon size={40} />
-                  </div>
-                )}
+              {/* Icon/Image Preview */}
+              <div className="h-40 bg-white/5 relative flex items-center justify-center">
+                <div className="absolute inset-0 opacity-20 bg-gradient-to-br from-brand-orange/20 to-transparent" />
+                <div className="relative z-10 scale-[2.5]">
+                  {(() => {
+                    const iconSource = (service.icon || service.name).toLowerCase();
+                    const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/;
+                    if (emojiRegex.test(service.icon || "")) {
+                      return <span className="text-xl">{service.icon}</span>;
+                    }
+                    
+                    const IconMap: any = { Droplets, Zap, Snowflake, Waves, Wrench, Settings, Disc, Car, ShieldCheck, Clock };
+                    const lucideMatch = Object.keys(IconMap).find(k => k.toLowerCase() === iconSource);
+                    if (lucideMatch) {
+                      const IconComponent = IconMap[lucideMatch];
+                      return <IconComponent className="text-brand-orange" />;
+                    }
+
+                    if (iconSource.includes("wash") || iconSource.includes("clean")) return <Waves className="text-blue-400" />;
+                    if (iconSource.includes("oil")) return <Droplets className="text-red-400" />;
+                    if (iconSource.includes("battery")) return <Zap className="text-yellow-400" />;
+                    
+                    return <Wrench className="text-white/20" />;
+                  })()}
+                </div>
                 <div className="absolute top-4 right-4 flex items-center gap-2">
                   <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${service.active ? 'bg-emerald-500/20 text-emerald-500' : 'bg-white/10 text-white/30'}`}>
                     {service.active ? "Active" : "Draft"}
@@ -312,15 +339,39 @@ export default function ServicesPage() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest px-1">Image URL</label>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between px-1">
+                    <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Icon / Keyword</label>
+                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center">
+                      {(() => {
+                        const iconSource = (formData.icon || formData.name).toLowerCase();
+                        const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/;
+                        if (emojiRegex.test(formData.icon || "")) {
+                          return <span className="text-xl">{formData.icon}</span>;
+                        }
+                        const IconMap: any = { Droplets, Zap, Snowflake, Waves, Wrench, Settings, Disc, Car, ShieldCheck, Clock };
+                        const lucideMatch = Object.keys(IconMap).find(k => k.toLowerCase() === iconSource);
+                        const IconComp = lucideMatch ? IconMap[lucideMatch] : Wrench;
+                        return <IconComp size={20} className={lucideMatch ? "text-brand-orange" : "text-white/20"} />;
+                      })()}
+                    </div>
+                  </div>
                   <input 
-                    type="url" 
-                    placeholder="https://images.unsplash.com/..."
-                    value={formData.image}
-                    onChange={(e) => setFormData({...formData, image: e.target.value})}
+                    type="text" 
+                    placeholder="e.g. wash, repair, or paste an emoji"
+                    value={formData.icon}
+                    onChange={(e) => {
+                      const val = e.target.value.trim();
+                      // Simple validation: only allow one "word" or one emoji
+                      if (val.split(/\s+/).length <= 1) {
+                        setFormData({...formData, icon: val});
+                      }
+                    }}
                     className="w-full bg-[#050505] border border-white/5 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-orange transition-all"
                   />
+                  <p className="text-[9px] text-white/20 px-1 italic">
+                    Type a keyword (wash, oil, engine), a Lucide name (Wrench, Disc), or paste a single Emoji.
+                  </p>
                 </div>
 
                 <div className="space-y-2">

@@ -15,8 +15,8 @@ export default function Home() {
     <main className="min-h-screen bg-[#0A0A0A] text-white overflow-x-hidden">
       <Navbar />
       <Hero />
-      <BeforeAfterSlider />
       <ServicesGrid />
+      <BeforeAfterSlider />
       <Locations />
       <NearbyGarages />
       <BookingCalendar />

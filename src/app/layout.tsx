@@ -15,7 +15,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "MUDWASH | Premium Auto Detailing",
   description: "High-end automotive detailing, ceramic coating, and interior restoration services.",
-  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -34,6 +33,8 @@ export const viewport = {
   initialScale: 1,
   maximumScale: 1,
 };
+
+import { AuthProvider } from "@/lib/AuthContext";
 
 export default function RootLayout({
   children,
@@ -59,7 +60,9 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

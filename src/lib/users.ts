@@ -5,6 +5,7 @@ export interface UserProfile {
   uid: string;
   name: string;
   email: string;
+  role: 'user' | 'admin';
   phone?: string;
   address?: string;
   city?: string;
@@ -14,7 +15,12 @@ export interface UserProfile {
 
 export const saveUserToFirestore = async (user: UserProfile) => {
   const userRef = doc(db, "users", user.uid);
-  await setDoc(userRef, user, { merge: true });
+  // Default to 'user' if role is not specified
+  const userData = {
+    ...user,
+    role: user.role || 'user'
+  };
+  await setDoc(userRef, userData, { merge: true });
 };
 
 export const getUserProfile = async (uid: string) => {

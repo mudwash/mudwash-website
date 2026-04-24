@@ -18,6 +18,7 @@ export interface Service {
   category: string;
   description: string;
   image: string;
+  icon?: string;
   active: boolean;
   createdAt?: any;
 }
@@ -25,17 +26,25 @@ export interface Service {
 const COLLECTION_NAME = "services";
 
 export const getServices = async (onlyActive = false) => {
-  const servicesCol = collection(db, COLLECTION_NAME);
-  const q = onlyActive 
-    ? query(servicesCol, where("active", "==", true))
-    : servicesCol;
+  try {
+    console.log("Attempting to fetch services from Firestore...", { onlyActive, collection: COLLECTION_NAME });
+    const servicesCol = collection(db, COLLECTION_NAME);
+    const q = onlyActive 
+      ? query(servicesCol, where("active", "==", true))
+      : servicesCol;
+      
+    const serviceSnapshot = await getDocs(q);
+    console.log(`Successfully fetched ${serviceSnapshot.docs.length} services from Firestore.`);
     
-  const serviceSnapshot = await getDocs(q);
-  const serviceList = serviceSnapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  })) as Service[];
-  return serviceList;
+    const serviceList = serviceSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })) as Service[];
+    return serviceList;
+  } catch (error) {
+    console.error("Error in getServices:", error);
+    throw error;
+  }
 };
 
 export const addService = async (service: Service) => {

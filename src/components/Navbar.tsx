@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Home, Settings, Calendar, User, CalendarDays, Wrench } from 'lucide-react';
+import { Home, ShoppingBag, Calendar, User, MessageSquare, CalendarDays, Wrench } from 'lucide-react';
 import gsap from 'gsap';
 import { usePathname } from 'next/navigation';
 import { auth } from '@/lib/firebase';
@@ -39,11 +39,11 @@ const Navbar = () => {
   }, []);
 
   const navLinks = [
-    { name: 'Home', href: '/', icon: <Home size={22} /> },
-    { name: 'Services', href: '/services', icon: <Settings size={22} /> },
-    { name: 'Parts', href: '/spare-parts', icon: <Wrench size={22} /> },
-    { name: 'Bookings', href: '/bookings', icon: <Calendar size={22} /> },
-    { name: 'Profile', href: isLoggedIn ? '/profile' : '/sign-up', icon: <User size={22} /> },
+    { name: 'Home', href: '/', icon: <Home size={24} /> },
+    { name: 'Shop', href: '/spare-parts', icon: <ShoppingBag size={24} /> },
+    { name: 'Bookings', href: '/bookings', icon: <Calendar size={24} /> },
+    { name: 'Message', href: '#', icon: <MessageSquare size={24} /> },
+    { name: 'Profile', href: isLoggedIn ? '/profile' : '/sign-up', icon: <User size={24} /> },
   ];
 
   return (
@@ -91,37 +91,26 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* PREMIUM TOP-CURVED BOTTOM BAR */}
+      {/* PREMIUM BOTTOM BAR */}
       <div 
         ref={bottomNavRef}
-        className="lg:hidden fixed bottom-0 left-0 w-full z-[1000] transition-all duration-300"
+        className="lg:hidden fixed bottom-0 left-0 w-full z-[1000]"
       >
-        <div className="bg-[#111111]/60 backdrop-blur-3xl border-t border-white/10 flex justify-around items-center pt-3 pb-6 px-4 shadow-[0_-15px_40px_rgba(0,0,0,0.6)] rounded-t-[3rem] relative">
-          {/* Inner Light Beam/Glow for Premium Look */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/4 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-          
+        <div className="bg-[#1C1C1E] border-t border-white/5 flex justify-around items-center pt-3 pb-8 px-2 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link
                 key={link.name}
                 href={link.href}
-                className={`flex flex-col items-center gap-1.5 transition-all w-16 ${isActive ? 'text-brand-orange scale-110' : 'text-white/50'}`}
+                className={`flex flex-col items-center gap-1 transition-all flex-1 ${isActive ? 'text-brand-orange' : 'text-[#8E8E93]'}`}
               >
-                <div className={`p-2 rounded-2xl transition-all duration-300 ${isActive ? 'bg-brand-orange/10 shadow-[0_0_20px_rgba(246,150,33,0.2)]' : ''}`}>
+                <div className="p-1 rounded-xl transition-all duration-300">
                   {link.icon}
                 </div>
-                <span className={`text-[9px] font-black uppercase tracking-wider transition-all ${isActive ? 'opacity-100' : 'opacity-40'}`}>
+                <span className="text-[10px] font-medium tracking-tight">
                   {link.name}
                 </span>
-                
-                {/* Active Underline Pill (Like the screenshot model) */}
-                {isActive && (
-                  <motion.div 
-                    layoutId="activeTab"
-                    className="absolute -bottom-1 w-8 h-1 bg-brand-orange rounded-full"
-                  />
-                )}
               </Link>
             );
           })}

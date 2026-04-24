@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
+    "@splinetool/react-spline": "^4.1.0",
     "firebase": "^12.12.1",
     "framer-motion": "^12.38.0",
     "gsap": "^3.15.0",

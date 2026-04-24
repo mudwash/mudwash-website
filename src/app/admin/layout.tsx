@@ -30,41 +30,16 @@ const sidebarLinks = [
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
+import { AdminGuard } from "@/components/RoleGuard";
+
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user === null) {
-        // Firebase resolved: no user logged in
-        localStorage.removeItem("admin_token");
-        router.push("/sign-in");
-        return;
-      }
-
-      if (user.email !== "wazeert13@gmail.com") {
-        // Logged in but not admin
-        console.warn("Unauthorized access attempt by:", user.email);
-        localStorage.removeItem("admin_token");
-        auth.signOut();
-        router.push("/sign-in");
-        return;
-      }
-
-      // Valid admin - persist token and allow access
-      localStorage.setItem("admin_token", "mudwash_session_active");
-      setIsLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [router]);
 
   const handleLogout = async () => {
     try {
@@ -76,10 +51,9 @@ export default function AdminLayout({
     }
   };
 
-  if (isLoading) return null;
-
   return (
-    <div className="flex h-screen bg-[#050505] text-white overflow-hidden font-sans">
+    <AdminGuard>
+      <div className="flex h-screen bg-[#050505] text-white overflow-hidden font-sans">
       {/* Sidebar */}
       <aside 
         className={`${
@@ -198,6 +172,7 @@ export default function AdminLayout({
           {children}
         </div>
       </main>
-    </div>
+      </div>
+    </AdminGuard>
   );
 }

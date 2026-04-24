@@ -38,7 +38,7 @@ const NearbyGarages = () => {
     <section className="py-8 px-6 pb-32">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold text-white tracking-tight">Nearby Garages</h2>
-        <button className="text-brand-orange text-xs font-bold uppercase tracking-wider">See All</button>
+        <button className="text-brand-orange text-sm font-semibold hover:opacity-80 transition-opacity">See All</button>
       </div>
 
       <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 snap-x">

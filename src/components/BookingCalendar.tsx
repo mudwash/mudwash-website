@@ -31,6 +31,14 @@ export default function BookingCalendar() {
   const [schedule, setSchedule] = useState<{id: string, day: string, name: string, slots: string[]}[]>([]);
   const [selectedDayId, setSelectedDayId] = useState("");
   const [selectedSlot, setSelectedSlot] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     // Generate dates on client to prevent hydration mismatch
@@ -64,70 +72,66 @@ export default function BookingCalendar() {
         </div>
 
         {/* Calendar Grid Container */}
-        <div className="w-full overflow-x-auto pb-4 hide-scrollbar snap-x snap-mandatory">
-          <div className="flex flex-col w-max min-w-full">
-            
-            {/* Header Row */}
-            <div className="flex w-full bg-[#1A1A1A]/90 backdrop-blur-md border-y border-white/5 shadow-2xl">
-              {schedule.map((col, idx) => (
-                <div 
-                  key={col.id}
-                  onClick={() => setSelectedDayId(col.id)}
-                  className="w-[14.28vw] min-w-[120px] flex flex-col items-center justify-center py-10 border-r border-white/5 last:border-0 min-h-[160px] transition-all cursor-pointer hover:bg-white/[0.02] shrink-0 snap-start"
-                >
-                  {selectedDayId === col.id ? (
-                    <motion.div 
-                      layoutId="activeDay"
-                      className="bg-white rounded-full w-24 h-24 flex flex-col items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.2)]"
-                    >
-                       <span className="text-3xl font-black text-black leading-none mb-1">{col.day}</span>
-                       <span className="text-[10px] font-black text-brand-orange uppercase tracking-wider">{col.name}</span>
-                    </motion.div>
-                  ) : (
-                    <div className="w-24 h-24 flex flex-col items-center justify-center opacity-40">
-                       <span className="text-3xl font-black text-white/40 leading-none mb-1">
-                          {col.day}
-                       </span>
-                       <span className="text-[10px] font-bold text-white/20 uppercase tracking-wider">
-                          {col.name}
-                       </span>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+        <div className="w-full">
+          {/* Header Row */}
+          <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-7 bg-[#1A1A1A]/90 backdrop-blur-md border-y border-white/5 shadow-2xl">
+            {schedule.slice(0, isMobile ? 3 : schedule.length).map((col, idx) => (
+              <div 
+                key={col.id}
+                onClick={() => setSelectedDayId(col.id)}
+                className="flex flex-col items-center justify-center py-6 md:py-10 border-r border-white/5 last:border-0 transition-all cursor-pointer hover:bg-white/[0.02]"
+              >
+                {selectedDayId === col.id ? (
+                  <motion.div 
+                    layoutId="activeDay"
+                    className="bg-white rounded-full w-16 h-16 md:w-24 md:h-24 flex flex-col items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.2)]"
+                  >
+                     <span className="text-xl md:text-3xl font-black text-black leading-none mb-1">{col.day}</span>
+                     <span className="text-[8px] md:text-[10px] font-black text-brand-orange uppercase tracking-wider">{col.name.substring(0, 3)}</span>
+                  </motion.div>
+                ) : (
+                  <div className="w-16 h-16 md:w-24 md:h-24 flex flex-col items-center justify-center opacity-40">
+                     <span className="text-xl md:text-3xl font-black text-white/40 leading-none mb-1">
+                        {col.day}
+                     </span>
+                     <span className="text-[8px] md:text-[10px] font-bold text-white/20 uppercase tracking-wider">
+                        {col.name.substring(0, 3)}
+                     </span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
 
-            {/* Time Slots Row */}
-            <div className="flex w-full mt-12 bg-transparent">
-              {schedule.map((col, idx) => (
-                <div key={col.id} className="w-[14.28vw] min-w-[120px] flex flex-col items-center gap-10 py-4 shrink-0">
-                  {col.slots.length === 0 ? (
-                     <div className="text-brand-orange/40 text-[10px] uppercase tracking-[0.2em] font-black mt-4">CLOSED</div>
-                  ) : (
-                     col.slots.map((slot, sIdx) => {
-                        const isSelected = selectedDayId === col.id && selectedSlot === slot;
-                        return (
-                           <div 
-                              key={sIdx}
-                              onClick={() => {
-                                 setSelectedDayId(col.id);
-                                 setSelectedSlot(slot);
-                              }}
-                              className={`cursor-pointer transition-all duration-300 text-center w-full ${
-                                isSelected 
-                                  ? 'text-brand-orange font-black scale-125' 
-                                  : 'text-white/90 hover:text-white text-base font-black tracking-tight'
-                              }`}
-                           >
-                              {slot}
-                           </div>
-                        )
-                     })
-                  )}
-                </div>
-              ))}
-            </div>
-
+          {/* Time Slots Row */}
+          <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-7 mt-8 md:mt-12">
+            {schedule.slice(0, isMobile ? 3 : schedule.length).map((col, idx) => (
+              <div key={col.id} className="flex flex-col items-center gap-6 md:gap-10 py-4">
+                {col.slots.length === 0 ? (
+                   <div className="text-brand-orange/40 text-[10px] uppercase tracking-[0.2em] font-black mt-4">CLOSED</div>
+                ) : (
+                   col.slots.map((slot, sIdx) => {
+                      const isSelected = selectedDayId === col.id && selectedSlot === slot;
+                      return (
+                         <div 
+                            key={sIdx}
+                            onClick={() => {
+                               setSelectedDayId(col.id);
+                               setSelectedSlot(slot);
+                            }}
+                            className={`cursor-pointer transition-all duration-300 text-center w-full ${
+                              isSelected 
+                                ? 'text-brand-orange font-black scale-110 md:scale-125' 
+                                : 'text-white/90 hover:text-white text-sm md:text-base font-black tracking-tight'
+                            }`}
+                         >
+                            {slot}
+                         </div>
+                      )
+                   })
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>
