@@ -48,17 +48,17 @@ export default function BookingCalendar() {
         <img 
           src="https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?q=80&w=2500&auto=format&fit=crop" 
           alt="Rain texture" 
-          className="w-full h-full object-cover filter grayscale contrast-125 brightness-[0.4]"
+          className="w-full h-full object-cover filter grayscale contrast-150 brightness-[0.3]"
         />
-        <div className="absolute inset-0 bg-[#0A0A0A]/40" />
+        <div className="absolute inset-0 bg-black/60" />
       </div>
 
       <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 md:px-8 flex flex-col items-center">
         {/* Headers */}
-        <div className="text-center mb-10">
-          <p className="text-brand-orange uppercase tracking-widest text-[11px] font-black mb-3">STEP 04</p>
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Date and Time</h2>
-          <p className="text-white/70 text-sm max-w-lg mx-auto leading-relaxed">
+        <div className="text-center mb-16">
+          <p className="text-brand-orange uppercase tracking-[0.3em] text-[10px] font-black mb-3">STEP 04</p>
+          <h2 className="text-5xl md:text-6xl font-black text-white mb-6 tracking-tighter">Date and Time</h2>
+          <p className="text-white/60 text-sm max-w-xl mx-auto leading-relaxed font-medium">
             Booking time slots are subject to availability. Final<br className="hidden sm:block"/> confirmation will be shared after review
           </p>
         </div>
@@ -68,27 +68,27 @@ export default function BookingCalendar() {
           <div className="flex flex-col w-max min-w-full">
             
             {/* Header Row */}
-            <div className="flex w-full bg-[#3D3D3D]/95 backdrop-blur-sm border-b border-[#2A2A2A] rounded-t-sm shadow-2xl">
+            <div className="flex w-full bg-[#1A1A1A]/90 backdrop-blur-md border-y border-white/5 shadow-2xl">
               {schedule.map((col, idx) => (
                 <div 
                   key={col.id}
                   onClick={() => setSelectedDayId(col.id)}
-                  className="w-[33.33vw] sm:w-[25vw] md:w-auto md:flex-1 flex flex-col items-center justify-center py-6 border-r border-[#2A2A2A]/50 last:border-0 min-h-[140px] transition-colors cursor-pointer hover:bg-white/5 shrink-0 snap-start"
+                  className="w-[14.28vw] min-w-[120px] flex flex-col items-center justify-center py-10 border-r border-white/5 last:border-0 min-h-[160px] transition-all cursor-pointer hover:bg-white/[0.02] shrink-0 snap-start"
                 >
                   {selectedDayId === col.id ? (
                     <motion.div 
                       layoutId="activeDay"
-                      className="bg-white rounded-full w-24 h-24 flex flex-col items-center justify-center shadow-lg"
+                      className="bg-white rounded-full w-24 h-24 flex flex-col items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.2)]"
                     >
-                       <span className="text-[28px] font-black text-black leading-tight">{col.day}</span>
-                       <span className="text-[11px] font-black text-brand-orange capitalize">{col.name}</span>
+                       <span className="text-3xl font-black text-black leading-none mb-1">{col.day}</span>
+                       <span className="text-[10px] font-black text-brand-orange uppercase tracking-wider">{col.name}</span>
                     </motion.div>
                   ) : (
-                    <div className="w-24 h-24 flex flex-col items-center justify-center">
-                       <span className={`text-[26px] font-black leading-tight transition-colors text-[#1A1A1A] drop-shadow-md`}>
+                    <div className="w-24 h-24 flex flex-col items-center justify-center opacity-40">
+                       <span className="text-3xl font-black text-white/40 leading-none mb-1">
                           {col.day}
                        </span>
-                       <span className={`text-[11px] font-black capitalize mt-1 transition-colors text-[#1A1A1A] drop-shadow-md`}>
+                       <span className="text-[10px] font-bold text-white/20 uppercase tracking-wider">
                           {col.name}
                        </span>
                     </div>
@@ -98,11 +98,11 @@ export default function BookingCalendar() {
             </div>
 
             {/* Time Slots Row */}
-            <div className="flex w-full mt-6 bg-transparent">
+            <div className="flex w-full mt-12 bg-transparent">
               {schedule.map((col, idx) => (
-                <div key={col.id} className="w-[33.33vw] sm:w-[25vw] md:w-auto md:flex-1 flex flex-col items-center gap-7 py-4 shrink-0">
+                <div key={col.id} className="w-[14.28vw] min-w-[120px] flex flex-col items-center gap-10 py-4 shrink-0">
                   {col.slots.length === 0 ? (
-                     <div className="text-white/30 text-xs uppercase tracking-widest font-bold mt-2">Closed</div>
+                     <div className="text-brand-orange/40 text-[10px] uppercase tracking-[0.2em] font-black mt-4">CLOSED</div>
                   ) : (
                      col.slots.map((slot, sIdx) => {
                         const isSelected = selectedDayId === col.id && selectedSlot === slot;
@@ -113,10 +113,10 @@ export default function BookingCalendar() {
                                  setSelectedDayId(col.id);
                                  setSelectedSlot(slot);
                               }}
-                              className={`cursor-pointer transition-all hover:scale-110 flex items-center justify-center ${
+                              className={`cursor-pointer transition-all duration-300 text-center w-full ${
                                 isSelected 
-                                  ? 'text-brand-orange font-bold scale-110 bg-black/40 px-3 py-1 rounded-md backdrop-blur-sm' 
-                                  : 'text-white hover:text-brand-orange text-sm font-semibold tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]'
+                                  ? 'text-brand-orange font-black scale-125' 
+                                  : 'text-white/90 hover:text-white text-base font-black tracking-tight'
                               }`}
                            >
                               {slot}
