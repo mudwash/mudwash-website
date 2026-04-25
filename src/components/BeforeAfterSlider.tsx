@@ -76,7 +76,7 @@ export default function BeforeAfterSlider() {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="relative w-full max-w-5xl mx-auto aspect-[16/9] md:aspect-[21/9] rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 group cursor-ew-resize"
+          className={`relative w-full max-w-5xl mx-auto aspect-[16/9] md:aspect-[21/9] rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 group cursor-ew-resize ${isDragging ? 'select-none' : ''}`}
           ref={containerRef}
           onMouseDown={(e) => {
             setIsDragging(true);
@@ -93,25 +93,26 @@ export default function BeforeAfterSlider() {
             style={{ backgroundImage: `url('/car-dirty.png')` }}
           />
 
-          {/* Clean Car Image (Clipped Overlay) */}
+          {/* Clean Car Image (Clipped Overlay) - Removed transition to fix lag */}
           <div 
-            className="absolute inset-0 bg-cover bg-center pointer-events-none transition-all duration-75"
+            className="absolute inset-0 bg-cover bg-center pointer-events-none"
             style={{ 
               backgroundImage: `url('/car-clean.png')`,
-              clipPath: `polygon(${sliderPosition}% 0, 100% 0, 100% 100%, ${sliderPosition}% 100%)`
+              clipPath: `polygon(${sliderPosition}% 0, 100% 0, 100% 100%, ${sliderPosition}% 100%)`,
+              WebkitClipPath: `polygon(${sliderPosition}% 0, 100% 0, 100% 100%, ${sliderPosition}% 100%)`
             }}
           />
 
           {/* Slider Handle Line */}
           <div 
             className="absolute top-0 bottom-0 w-1 bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)] z-20 pointer-events-none"
-            style={{ left: `calc(${sliderPosition}% - 2px)` }}
+            style={{ left: `${sliderPosition}%` }}
           >
             {/* Slider Handle Button */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-brand-orange rounded-full flex items-center justify-center shadow-lg border-2 border-white pointer-events-auto shadow-[0_0_15px_rgba(246,150,33,0.5)]">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M8 8L4 12L8 16" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M16 8L20 12L16 16" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-brand-orange rounded-full flex items-center justify-center shadow-lg border-2 border-white pointer-events-auto shadow-[0_0_15px_rgba(246,150,33,0.5)] transition-transform group-hover:scale-110 active:scale-95">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 8L4 12L8 16" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M16 8L20 12L16 16" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
           </div>
