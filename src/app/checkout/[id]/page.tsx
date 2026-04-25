@@ -110,6 +110,7 @@ export default function CheckoutPage() {
           address: formData.address,
           city: formData.city,
           zipCode: formData.zipCode,
+          role: 'user',
           createdAt: new Date().toISOString()
         });
       }
@@ -142,6 +143,7 @@ export default function CheckoutPage() {
             address: formData.address,
             city: formData.city,
             zipCode: formData.zipCode,
+            role: 'user',
             createdAt: new Date().toISOString()
           });
         }
