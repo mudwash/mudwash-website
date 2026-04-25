@@ -23,7 +23,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getParts, Part } from "@/lib/parts";
 import { auth } from "@/lib/firebase";
-import { saveUserToFirestore } from "@/lib/users";
+import { saveUserToFirestore, UserProfile } from "@/lib/users";
 
 export default function CheckoutPage() {
   const { id } = useParams();
@@ -102,7 +102,7 @@ export default function CheckoutPage() {
       // Save user details for COD as well
       const user = auth.currentUser;
       if (user) {
-        await saveUserToFirestore({
+        const userProfile: UserProfile = {
           uid: user.uid,
           name: formData.fullName,
           email: formData.email,
@@ -112,7 +112,8 @@ export default function CheckoutPage() {
           zipCode: formData.zipCode,
           role: 'user',
           createdAt: new Date().toISOString()
-        });
+        };
+        await saveUserToFirestore(userProfile);
       }
 
       setTimeout(() => {
@@ -135,7 +136,7 @@ export default function CheckoutPage() {
         // Save user details to Firestore for future use
         const user = auth.currentUser;
         if (user) {
-          await saveUserToFirestore({
+          const userProfile: UserProfile = {
             uid: user.uid,
             name: formData.fullName,
             email: formData.email,
@@ -145,7 +146,8 @@ export default function CheckoutPage() {
             zipCode: formData.zipCode,
             role: 'user',
             createdAt: new Date().toISOString()
-          });
+          };
+          await saveUserToFirestore(userProfile);
         }
 
         setIsProcessing(false);
