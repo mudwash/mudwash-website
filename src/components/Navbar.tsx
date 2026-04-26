@@ -186,7 +186,7 @@ const Navbar = () => {
                     : ''
                   }`}
                 >
-                  {React.cloneElement(link.icon as React.ReactElement, { 
+                  {React.cloneElement(link.icon as any, { 
                     strokeWidth: (isActive || link.isCenter) ? 2.5 : 2
                   })}
                 </motion.div>
