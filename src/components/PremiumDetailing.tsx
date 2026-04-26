@@ -2,126 +2,140 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { ChevronRight, Car, Beaker, SprayCan, Wrench } from "lucide-react";
+import { ChevronRight, Car, Shield, Sparkles, UserCheck, PhoneCall } from "lucide-react";
 import Link from "next/link";
 
 export default function PremiumDetailing() {
   const features = [
     {
-      icon: <Car size={36} strokeWidth={1.5} />,
-      title: "On-Site Mobile Service",
-      description:
-        "We come fully equipped to your home or office, delivering professional car detailing without disrupting your schedule.",
+      icon: <Car className="w-8 h-8" />,
+      title: "Mobile Service",
+      description: "Professional detailing at your home or office.",
     },
     {
-      icon: <Beaker size={36} strokeWidth={1.5} />,
-      title: "Premium-Grade Products",
-      description:
-        "Only trusted, high-quality detailing products are used to protect your paint, interior surfaces, and finishes.",
+      icon: <Shield className="w-8 h-8" />,
+      title: "Premium Protection",
+      description: "High-grade products for lasting shine & care.",
     },
     {
-      icon: <SprayCan size={36} strokeWidth={1.5} />,
-      title: "Attention to Every Detail",
-      description:
-        "From hard-to-reach areas to fine finishing touches, we ensure a deep clean that meets premium standards.",
+      icon: <Sparkles className="w-8 h-8" />,
+      title: "Detail Perfection",
+      description: "Deep cleaning with attention to every corner.",
     },
     {
-      icon: <Wrench size={36} strokeWidth={1.5} />,
-      title: "Skilled Detailing Experts",
-      description:
-        "Our trained technicians use proven techniques to safely restore, clean, and enhance every part of your vehicle.",
+      icon: <UserCheck className="w-8 h-8" />,
+      title: "Certified Experts",
+      description: "Trained technicians using advanced techniques.",
     },
   ];
 
   return (
-    <section className="w-full bg-[#050505] text-white py-16 lg:py-24 border-t border-white/5 overflow-hidden">
-      <div className="max-w-[1400px] mx-auto px-6 md:px-12">
-        {/* Top Section: Split Content */}
-        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
-          {/* Left Content */}
+    <section className="relative w-full bg-[#030303] text-white py-24 lg:py-32 overflow-hidden border-t border-white/5">
+      {/* Background Subtle Elements */}
+      <div className="absolute top-0 right-0 w-1/2 h-full bg-brand-orange/5 blur-[150px] -z-10 opacity-30" />
+      
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        {/* Top Hero Layout: Robust Overlap */}
+        <div className="flex flex-col lg:flex-row items-center gap-0 mb-32">
+          
+          {/* Content Card (Left) */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="w-full lg:w-1/2 flex flex-col items-start pr-0 lg:pr-10"
+            className="w-full lg:w-[48%] z-20"
           >
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-10 h-[1px] bg-brand-orange"></div>
-              <span className="text-brand-orange text-[10px] sm:text-xs font-black tracking-[0.3em] uppercase">
-                Modern Equipment
-              </span>
-            </div>
+            <div className="bg-[#0A0A0A] backdrop-blur-3xl border border-white/10 p-8 md:p-16 rounded-[2.5rem] md:rounded-[3.5rem] shadow-[20px_20px_60px_rgba(0,0,0,0.8)] lg:mr-[-10%] relative">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-8 h-[1px] bg-brand-orange" />
+                <span className="text-brand-orange text-[10px] font-black uppercase tracking-[0.4em]">
+                  Mastercraft
+                </span>
+              </div>
 
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight mb-6">
-              Premium Car Detailing at Your Doorstep
-            </h2>
+              <h2 className="text-4xl md:text-6xl font-black text-white leading-[1.1] mb-8 tracking-tighter">
+                Premium Detailing <br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange to-[#ffaa44] italic">At Your Door</span>
+              </h2>
 
-            <p className="text-white/60 font-medium text-sm sm:text-base leading-relaxed mb-8">
-              Whether you're short on time or simply love convenience, our{" "}
-              <strong className="text-white">mobile car detailing</strong>{" "}
-              brings top-tier cleaning right to your doorstep. From a quick
-              exterior wash to deep interior detailing, we use only{" "}
-              <strong className="text-white">high-quality</strong> and expert
-              techniques to give your car the care it deserves.
-            </p>
-
-            <div className="mb-10">
-              <p className="text-xl sm:text-3xl font-bold text-white border-l-4 border-brand-orange pl-4">
-                Call for book: <span className="font-black">+971502374199</span>
+              <p className="text-white/40 text-sm md:text-base leading-relaxed mb-12 font-medium max-w-md">
+                Whether you're short on time or simply love convenience, our mobile car detailing brings top-tier cleaning right to your doorstep. We use only high-grade products and expert techniques.
               </p>
-            </div>
 
-            <Link
-              href="/book"
-              className="inline-flex items-center justify-center gap-2 bg-[#f69621] text-white px-8 py-4 rounded-full font-bold text-sm uppercase tracking-wider hover:bg-[#d98018] transition-colors group"
-            >
-              Book Now
-              <ChevronRight
-                size={18}
-                className="group-hover:translate-x-1 transition-transform"
-              />
-            </Link>
+              <div className="flex flex-wrap items-center gap-8">
+                <button
+                  onClick={() => {
+                    const contactForm = document.getElementById('booking-contact-form');
+                    if (contactForm) {
+                      const offset = 100;
+                      const bodyRect = document.body.getBoundingClientRect().top;
+                      const elementRect = contactForm.getBoundingClientRect().top;
+                      const elementPosition = elementRect - bodyRect;
+                      const offsetPosition = elementPosition - offset;
+                      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                    }
+                  }}
+                  className="inline-flex items-center justify-center gap-3 bg-brand-orange text-black px-10 py-5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-white transition-all duration-500 group shadow-[0_10px_30px_rgba(246,150,33,0.3)] cursor-pointer"
+                >
+                  Book Session
+                  <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+                
+                <div className="flex items-center gap-4 group cursor-pointer">
+                  <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-brand-orange group-hover:border-brand-orange transition-all duration-300">
+                    <PhoneCall size={18} className="text-brand-orange group-hover:text-black transition-colors" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest leading-none mb-1">Call Now</span>
+                    <span className="text-white font-black text-sm">+971 50 237 4199</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </motion.div>
 
-          {/* Right Image */}
+          {/* Main Image Container (Right) */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="w-full lg:w-1/2 relative h-[400px] sm:h-[500px] lg:h-[600px]  overflow-hidden drop-shadow-xl"
+            transition={{ duration: 1 }}
+            className="w-full lg:w-[62%] mt-[-40px] lg:mt-0"
           >
-            {/* Dark overlay just like the image reference slightly */}
-            <div className="absolute inset-0 bg-black/30 z-10" />
-            <img
-              src="https://i.pinimg.com/1200x/31/5b/d2/315bd25368761d7af69e50b330faede5.jpg"
-              alt="Premium Car Detailing"
-              className="w-full h-full object-cover"
-            />
+            <div className="relative aspect-[4/3] lg:aspect-[16/10] overflow-hidden rounded-[2.5rem] md:rounded-[3.5rem] shadow-2xl border border-white/5">
+              <img
+                src="https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?q=80&w=2000&auto=format&fit=crop"
+                alt="Premium Detailing"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-l from-black/40 via-transparent to-black/80" />
+            </div>
           </motion.div>
         </div>
 
-        {/* Bottom Section: Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mt-20 pt-16 border-t border-white/10 gap-8 lg:gap-0">
+        {/* Features Row: Sleek Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature, idx) => (
             <motion.div
               key={idx}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: idx * 0.1 }}
-              className={`flex flex-col items-center text-center px-4 sm:px-8 ${
-                idx !== features.length - 1 ? "lg:border-r border-white/10" : ""
-              }`}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
+              className="group relative p-8 rounded-3xl bg-[#080808] border border-white/5 hover:border-brand-orange/30 transition-all duration-500 overflow-hidden"
             >
-              <div className="text-brand-orange mb-6 bg-brand-orange/10 p-4 rounded-full">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-brand-orange/5 blur-2xl -z-10 group-hover:bg-brand-orange/10 transition-colors" />
+              
+              <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center text-brand-orange mb-6 group-hover:scale-110 group-hover:bg-brand-orange group-hover:text-black transition-all duration-500">
                 {feature.icon}
               </div>
-              <h3 className="text-lg font-black text-white mb-4 h-auto lg:h-[56px] flex items-center justify-center">
+              
+              <h3 className="text-lg font-black text-white mb-3 tracking-tight group-hover:text-brand-orange transition-colors">
                 {feature.title}
               </h3>
-              <p className="text-white/60 font-medium text-sm leading-relaxed">
+              
+              <p className="text-white/30 text-xs font-medium leading-relaxed group-hover:text-white/50 transition-colors">
                 {feature.description}
               </p>
             </motion.div>

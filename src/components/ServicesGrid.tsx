@@ -16,7 +16,12 @@ import {
   Disc, 
   Car,
   ShieldCheck,
-  Clock
+  Clock,
+  Search,
+  Sparkles,
+  Settings2,
+  Activity,
+  Layers
 } from "lucide-react";
 
 const IconMap: Record<string, React.ElementType> = {
@@ -29,36 +34,47 @@ const IconMap: Record<string, React.ElementType> = {
   Disc, 
   Car,
   ShieldCheck,
-  Clock
+  Clock,
+  Search,
+  Sparkles,
+  Settings2,
+  Activity,
+  Layers
 };
 
 const getIconForService = (service: Service) => {
-  const iconSource = (service.icon || service.name).toLowerCase();
+  const name = service.name.toLowerCase();
+  const iconField = (service.icon || "").toLowerCase();
+  const source = `${name} ${iconField}`;
   
-  // 1. Emoji Detection
+  // 1. Smart Keyword Detection (Prioritized for better look)
+  if (source.includes("inspection") || source.includes("checkup")) return <Search className="text-[#A0C2C2]" size={32} />;
+  if (source.includes("suspension") || source.includes("spring") || source.includes("shock")) return <Activity className="text-brand-orange" size={32} />;
+  if (source.includes("checking") || source.includes("service check")) return <ShieldCheck className="text-[#32CD32]" size={32} />;
+  if (source.includes("ceramic") || source.includes("coating") || source.includes("polish")) return <Sparkles className="text-[#FFD700]" size={32} />;
+  if (source.includes("wash") || source.includes("clean") || source.includes("exterior")) return <Waves className="text-[#00BFFF]" size={32} />;
+  if (source.includes("oil") || source.includes("fluid")) return <Droplets className="text-[#FF4D4D]" size={32} />;
+  if (source.includes("battery") || source.includes("power") || source.includes("zap")) return <Zap className="text-[#FFD700]" size={32} />;
+  if (source.includes("ac") || source.includes("air") || source.includes("cool")) return <Snowflake className="text-[#40E0D0]" size={32} />;
+  if (source.includes("brake") || source.includes("stop")) return <Disc className="text-[#FF0000]" size={32} />;
+  if (source.includes("engine") || source.includes("tune") || source.includes("motor")) return <Settings2 className="text-brand-orange" size={32} />;
+  if (source.includes("interior") || source.includes("car") || source.includes("seat")) return <Car className="text-[#DA70D6]" size={32} />;
+  if (source.includes("gear") || source.includes("clutch") || source.includes("system")) return <Settings className="text-[#32CD32]" size={32} />;
+  if (source.includes("paint") || source.includes("shield") || source.includes("protect")) return <ShieldCheck className="text-[#BA55D3]" size={32} />;
+  if (source.includes("time") || source.includes("fast") || source.includes("clock")) return <Clock className="text-brand-orange" size={32} />;
+
+  // 2. Emoji Detection (Fallback)
   const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/;
   if (emojiRegex.test(service.icon || "")) {
     return <span className="text-3xl">{service.icon}</span>;
   }
 
-  // 2. Lucide Name Match
-  const lucideMatch = Object.keys(IconMap).find(k => k.toLowerCase() === iconSource);
+  // 3. Lucide Name Match
+  const lucideMatch = Object.keys(IconMap).find(k => k.toLowerCase() === iconField);
   if (lucideMatch) {
     const IconComponent = IconMap[lucideMatch];
     return <IconComponent className="text-brand-orange" size={32} />;
   }
-
-  // 3. Smart Keyword Detection
-  if (iconSource.includes("wash") || iconSource.includes("clean") || iconSource.includes("exterior")) return <Waves className="text-[#00BFFF]" size={32} />;
-  if (iconSource.includes("oil") || iconSource.includes("fluid")) return <Droplets className="text-[#FF4D4D]" size={32} />;
-  if (iconSource.includes("battery") || iconSource.includes("power") || iconSource.includes("zap")) return <Zap className="text-[#FFD700]" size={32} />;
-  if (iconSource.includes("ac") || iconSource.includes("air") || iconSource.includes("cool")) return <Snowflake className="text-[#40E0D0]" size={32} />;
-  if (iconSource.includes("engine") || iconSource.includes("repair") || iconSource.includes("tune")) return <Wrench className="text-[#FFA500]" size={32} />;
-  if (iconSource.includes("interior") || iconSource.includes("car") || iconSource.includes("seat")) return <Car className="text-[#DA70D6]" size={32} />;
-  if (iconSource.includes("brake") || iconSource.includes("stop")) return <Disc className="text-[#FF0000]" size={32} />;
-  if (iconSource.includes("gear") || iconSource.includes("clutch") || iconSource.includes("system")) return <Settings className="text-[#32CD32]" size={32} />;
-  if (iconSource.includes("paint") || iconSource.includes("shield") || iconSource.includes("protect")) return <ShieldCheck className="text-[#BA55D3]" size={32} />;
-  if (iconSource.includes("time") || iconSource.includes("fast") || iconSource.includes("clock")) return <Clock className="text-brand-orange" size={32} />;
   
   return <Wrench className="text-brand-orange/50" size={32} />; // Default
 };
@@ -115,7 +131,7 @@ const ServicesGrid = () => {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 md:gap-6">
+          <div className="flex md:grid md:grid-cols-6 lg:grid-cols-8 gap-4 md:gap-6 overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 scrollbar-hide snap-x">
             {services.slice(0, 8).map((service, index) => (
               <motion.div
                 key={service.id}
@@ -123,7 +139,7 @@ const ServicesGrid = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.05, duration: 0.3 }}
-                className="flex flex-col items-center gap-2 group cursor-pointer"
+                className="flex flex-col items-center gap-2 group cursor-pointer flex-shrink-0 w-[85px] md:w-auto snap-start"
                 onClick={() => {
                   setSelectedService(service.name);
                   setIsModalOpen(true);

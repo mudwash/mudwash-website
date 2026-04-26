@@ -6,114 +6,126 @@ import { MapPin } from "lucide-react";
 
 const Locations = () => {
   return (
-    <section className="relative w-full py-24 bg-[#050505] overflow-hidden">
-      {/* Background World Map Pattern (Stylized) */}
-      <div
-        className="absolute inset-0 z-0 opacity-50 pointer-events-none"
+    <section className="relative w-full py-32 bg-[#020202] overflow-hidden">
+      {/* Immersive Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full opacity-30 pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-brand-orange/5 blur-[150px] rounded-full" />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-brand-orange/10 blur-[120px] rounded-full" />
+      </div>
+      
+      {/* Stylized Grid Pattern */}
+      <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none"
         style={{
-          backgroundImage:
-            "radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0)",
-          backgroundSize: "24px 24px",
-          maskImage:
-            "radial-gradient(ellipse at center, black 20%, transparent 70%)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse at center, black 20%, transparent 70%)",
+          backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
+          backgroundSize: "60px 60px"
         }}
       />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-        <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
-          {/* Left: Image Container */}
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-16 lg:gap-24 min-h-[600px]">
+          
+          {/* Left: Atmospheric Visual */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            viewport={{ once: true }}
+            transition={{ duration: 1 }}
             className="w-full lg:w-1/2 relative flex justify-center"
           >
-            {/* Soft glow behind the image */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-brand-orange/10 blur-[100px] rounded-full point-events-none" />
-
-            <img
-              src="https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?auto=format&fit=crop&q=80&w=800"
-              alt="High Pressure Washer"
-              className="w-[80%] max-w-md object-contain drop-shadow-[0_15px_35px_rgba(0,0,0,0.5)] hover:scale-105 transition-all duration-700"
-            />
+            <div className="relative group w-full max-w-[500px]">
+              <div className="absolute -inset-4 bg-brand-orange/10 blur-3xl rounded-[3rem] opacity-50" />
+              <img
+                src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1200"
+                alt="Luxury Car Detail"
+                className="relative rounded-[2.5rem] border border-white/10 shadow-2xl grayscale-[0.3] group-hover:grayscale-0 transition-all duration-1000 object-cover aspect-square w-full"
+              />
+              <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
+              
+              {/* Floating Badge */}
+              <motion.div 
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -bottom-6 -right-6 bg-brand-orange p-6 rounded-3xl shadow-2xl z-20"
+              >
+                <span className="text-black font-black text-3xl italic leading-none">24/7</span>
+                <p className="text-black font-bold text-[8px] uppercase tracking-widest mt-1">Availability</p>
+              </motion.div>
+            </div>
           </motion.div>
 
-          {/* Right: Content */}
-          <div className="w-full lg:w-1/2 space-y-10">
-            {/* Header */}
+          {/* Right: Network Content */}
+          <div className="w-full lg:w-1/2 flex flex-col justify-center">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="space-y-4"
+              transition={{ duration: 0.8 }}
+              className="mb-10"
             >
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-[1px] bg-brand-orange"></div>
-                <span className="text-brand-orange text-[10px] font-black tracking-[0.3em] uppercase">
-                  Locations
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-10 h-[2px] bg-brand-orange" />
+                <span className="text-brand-orange text-[9px] font-black tracking-[0.5em] uppercase">
+                  Service Network
                 </span>
               </div>
-              <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-white">
-                Dubai
+              <h2 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter text-white uppercase italic leading-[0.95] mb-6">
+                United Arab <br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange to-[#ffaa44]">Emirates</span>
               </h2>
+              <p className="text-white/40 text-sm font-medium max-w-md leading-relaxed">
+                We are expanding our premium mobile detailing network across the UAE. Currently serving Dubai with upcoming expansions.
+              </p>
             </motion.div>
 
-            {/* Grid Items */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-12">
-              {/* Item 1 */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="flex items-start gap-3"
-              >
-                <MapPin className="text-brand-orange mt-1" size={24} />
-                <div>
-                  <h4 className="text-white font-extrabold text-lg mb-1">
-                    Service region
-                  </h4>
-                  <p className="text-white/60 font-medium text-sm">Dubai</p>
-                </div>
-              </motion.div>
-
-              {/* Item 2 */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="flex items-start gap-3"
-              >
-                <MapPin className="text-brand-orange mt-1" size={24} />
-                <div>
-                  <h4 className="text-white font-extrabold text-lg mb-1">
-                    On-coming
-                  </h4>
-                  <p className="text-white/60 font-medium text-sm">Abu Dhabi</p>
-                </div>
-              </motion.div>
-
-              {/* Item 3 */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                className="flex items-start gap-3"
-              >
-                <MapPin className="text-brand-orange mt-1" size={24} />
-                <div>
-                  <h4 className="text-white font-extrabold text-lg mb-1 uppercase">
-                    On-coming
-                  </h4>
-                  <p className="text-white/60 font-medium text-sm">Sharjah</p>
-                </div>
-              </motion.div>
+            {/* Location Cards */}
+            <div className="grid gap-4 max-w-lg">
+              {[
+                { city: 'Dubai', status: 'Service Region', active: true },
+                { city: 'Abu Dhabi', status: 'Coming Soon', active: false },
+                { city: 'Sharjah', status: 'On-coming', active: false }
+              ].map((loc, idx) => (
+                <motion.div
+                  key={loc.city}
+                  initial={{ opacity: 0, y: 15 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  className={`group relative p-5 rounded-[1.5rem] border transition-all duration-500 overflow-hidden ${
+                    loc.active 
+                    ? 'bg-brand-orange/5 border-brand-orange/20' 
+                    : 'bg-white/[0.02] border-white/5 grayscale opacity-60'
+                  }`}
+                >
+                  <div className="flex items-center justify-between relative z-10">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-500 ${
+                        loc.active ? 'bg-brand-orange text-black' : 'bg-white/5 text-white/20'
+                      }`}>
+                        <MapPin size={20} />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-black text-white uppercase italic group-hover:text-brand-orange transition-colors">
+                          {loc.city}
+                        </h3>
+                        <p className={`text-[8px] font-black uppercase tracking-widest mt-0.5 ${
+                          loc.active ? 'text-brand-orange' : 'text-white/20'
+                        }`}>
+                          {loc.status}
+                        </p>
+                      </div>
+                    </div>
+                    {loc.active && (
+                      <div className="flex items-center gap-1.5 px-3 py-1 bg-brand-orange/10 border border-brand-orange/20 rounded-full">
+                        <div className="w-1.5 h-1.5 bg-brand-orange rounded-full animate-pulse" />
+                        <span className="text-brand-orange text-[8px] font-black uppercase tracking-widest">Active</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Hover background effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-brand-orange/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                </motion.div>
+              ))}
             </div>
           </div>
         </div>

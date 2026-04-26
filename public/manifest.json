@@ -1,24 +1,46 @@
 {
-  "name": "MUDWASH | Premium Auto Detailing",
+  "name": "MUDWASH Premium Detailing",
   "short_name": "MUDWASH",
-  "description": "High-end automotive detailing, ceramic coating, and interior restoration services.",
+  "description": "Professional mobile automotive detailing and ceramic coating services.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#f69621",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "/icon-192x192.png",
+      "src": "icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "/icon-512x512.png",
+      "src": "icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["lifestyle", "business"],
+  "screenshots": [
+    {
+      "src": "car-clean.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Luxury Detailing"
     }
   ]
-
 }
