@@ -8,6 +8,13 @@ import gsap from 'gsap';
 import { usePathname } from 'next/navigation';
 import { auth } from '@/lib/firebase';
 
+interface NavLink {
+  name: string;
+  href: string;
+  icon: React.ReactNode;
+  isCenter?: boolean;
+}
+
 const Navbar = () => {
   const topNavRef = useRef<HTMLElement>(null);
   const bottomNavRef = useRef<HTMLDivElement>(null);
@@ -27,7 +34,6 @@ const Navbar = () => {
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
-    // Initial check
     if ((window as any).deferredPrompt) {
       setIsInstallable(true);
     }
@@ -67,7 +73,7 @@ const Navbar = () => {
     window.dispatchEvent(new CustomEvent('trigger-pwa-install'));
   };
 
-  const navLinks = [
+  const navLinks: NavLink[] = [
     { name: 'Home', href: '/', icon: <Home size={22} /> },
     { name: 'Shop', href: '/spare-parts', icon: <ShoppingBag size={22} /> },
     { name: 'Book', href: '/bookings', icon: <Plus size={26} />, isCenter: true },
@@ -96,24 +102,16 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center gap-12">
             {navLinks.filter(l => l.name !== 'Profile' && !l.isCenter).map((link) => {
               const isActive = pathname === link.href;
-              const isInstall = link.isInstall;
 
               return (
-                <button
+                <Link
                   key={link.name}
-                  onClick={isInstall ? handleInstallClick : undefined}
+                  href={link.href}
                   className={`text-[10px] font-black uppercase tracking-[0.4em] relative group transition-colors ${isActive ? 'text-brand-orange' : 'text-white/40 hover:text-white'}`}
                 >
-                  {isInstall ? (
-                    <div className="flex items-center gap-2">
-                      <Download size={14} className="group-hover:-translate-y-0.5 transition-transform" />
-                      <span>{link.name}</span>
-                    </div>
-                  ) : (
-                    <Link href={link.href}>{link.name}</Link>
-                  )}
+                  {link.name}
                   
-                  {isActive && !isInstall && (
+                  {isActive && (
                     <motion.div 
                       layoutId="nav-underline"
                       className="absolute -bottom-2 left-0 right-0 h-[2px] bg-brand-orange rounded-full shadow-[0_0_10px_#f69621]"
@@ -122,7 +120,7 @@ const Navbar = () => {
                   {!isActive && (
                     <span className="absolute -bottom-2 left-1/2 w-0 h-[2px] bg-white/20 transition-all duration-300 group-hover:w-full group-hover:left-0 rounded-full" />
                   )}
-                </button>
+                </Link>
               );
             })}
           </div>
@@ -169,17 +167,13 @@ const Navbar = () => {
           {/* Active Spotlight */}
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
-            const isInstall = link.isInstall;
 
             return (
               <button
                 key={link.name}
-                onClick={isInstall ? handleInstallClick : undefined}
                 className={`relative flex flex-col items-center justify-center transition-all duration-500 z-20 flex-1 h-full`}
               >
-                {!isInstall && (
-                  <Link href={link.href} className="absolute inset-0 z-30" />
-                )}
+                <Link href={link.href} className="absolute inset-0 z-30" />
                 
                 <motion.div 
                   animate={{ 
@@ -193,7 +187,7 @@ const Navbar = () => {
                   }`}
                 >
                   {React.cloneElement(link.icon as React.ReactElement, { 
-                    strokeWidth: (isActive || link.isCenter || isInstall) ? 2.5 : 2
+                    strokeWidth: (isActive || link.isCenter) ? 2.5 : 2
                   })}
                 </motion.div>
               </button>
