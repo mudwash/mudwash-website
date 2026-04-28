@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { Calendar, Clock, ChevronRight, ChevronLeft } from 'lucide-react';
 
 // Helper to generate the exact next N days
@@ -60,10 +61,12 @@ export default function BookingCalendar() {
     <section className="relative w-full py-32 bg-[#050505] overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 z-0">
-        <img 
+        <Image 
           src="https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?q=80&w=2500&auto=format&fit=crop" 
           alt="Rain texture" 
-          className="w-full h-full object-cover filter grayscale contrast-150 brightness-[0.15]"
+          fill
+          className="object-cover filter grayscale contrast-150 brightness-[0.15]"
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
         <div className="absolute top-1/4 -left-1/4 w-1/2 h-1/2 bg-brand-orange/5 rounded-full blur-[120px]" />

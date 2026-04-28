@@ -26,6 +26,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     const fetchData = async () => {
       try {
         const [bookingsData, servicesData, partsData] = await Promise.all([
@@ -33,16 +34,19 @@ export default function AdminDashboard() {
           getServices(),
           getParts()
         ]);
-        setBookings(bookingsData);
-        setServiceCount(servicesData.length);
-        setPartsCount(partsData.length);
+        if (isMounted) {
+          setBookings(bookingsData);
+          setServiceCount(servicesData.length);
+          setPartsCount(partsData.length);
+        }
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
     fetchData();
+    return () => { isMounted = false; };
   }, []);
 
   const totalRevenue = bookings

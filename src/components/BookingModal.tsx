@@ -13,7 +13,7 @@ interface BookingModalProps {
   serviceName: string;
 }
 
-const BookingModal = ({ isOpen, onClose, serviceName }: BookingModalProps) => {
+export default function BookingModal({ isOpen, onClose, serviceName }: BookingModalProps) {
   const [carQuery, setCarQuery] = useState("");
   const [carSuggestions, setCarSuggestions] = useState<string[]>([]);
   const [isSearchingCars, setIsSearchingCars] = useState(false);
@@ -25,23 +25,30 @@ const BookingModal = ({ isOpen, onClose, serviceName }: BookingModalProps) => {
   const [allCars, setAllCars] = useState<string[]>([]);
   const router = useRouter();
 
+  const isMounted = useRef(false);
+
   // Enforce login only after Firebase confirms user is not signed in
   useEffect(() => {
+    isMounted.current = true;
     if (isOpen) {
       const unsubscribe = auth.onAuthStateChanged((user) => {
-        if (user === null) {
+        if (user === null && isMounted.current) {
           // Firebase has resolved and user is definitely not logged in
           onClose();
           router.push("/sign-in?returnTo=/services");
         }
       });
-      return () => unsubscribe();
+      return () => {
+        isMounted.current = false;
+        unsubscribe();
+      };
     }
+    return () => { isMounted.current = false; };
   }, [isOpen, router, onClose]);
 
   // Clear state on open/close
   useEffect(() => {
-    if (!isOpen) {
+    if (!isOpen && isMounted.current) {
       setCarQuery("");
       setShowCarDropdown(false);
       setCarSuggestions([]);
@@ -51,7 +58,7 @@ const BookingModal = ({ isOpen, onClose, serviceName }: BookingModalProps) => {
   // Handle clicking outside the dropdown to close it
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node) && isMounted.current) {
         setShowCarDropdown(false);
       }
     };
@@ -62,32 +69,32 @@ const BookingModal = ({ isOpen, onClose, serviceName }: BookingModalProps) => {
   // Fetch the local indian cars dataset once when the modal opens
   useEffect(() => {
     if (isOpen && allCars.length === 0) {
-      setIsSearchingCars(true);
+      if (isMounted.current) setIsSearchingCars(true);
       fetch('/indian_cars.json')
         .then(res => res.json())
         .then(data => {
-          if (Array.isArray(data)) {
+          if (Array.isArray(data) && isMounted.current) {
             setAllCars(data);
           }
-          setIsSearchingCars(false);
+          if (isMounted.current) setIsSearchingCars(false);
         })
         .catch(err => {
           console.error("Failed to load cars dataset", err);
-          setIsSearchingCars(false);
+          if (isMounted.current) setIsSearchingCars(false);
         });
     }
   }, [isOpen, allCars.length]);
 
   // Filter cars smoothly in-memory
   useEffect(() => {
-    if (!carQuery || !showCarDropdown) {
+    if ((!carQuery || !showCarDropdown) && isMounted.current) {
       setCarSuggestions([]);
       return;
     }
 
     const query = carQuery.toLowerCase();
     const matches = allCars.filter(car => car.toLowerCase().includes(query));
-    setCarSuggestions(matches.slice(0, 10));
+    if (isMounted.current) setCarSuggestions(matches.slice(0, 10));
   }, [carQuery, allCars, showCarDropdown]);
 
   // Prevent scrolling when modal is open
@@ -258,4 +265,3 @@ const BookingModal = ({ isOpen, onClose, serviceName }: BookingModalProps) => {
   );
 };
 
-export default BookingModal;

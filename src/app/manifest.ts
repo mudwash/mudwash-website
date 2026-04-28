@@ -1,21 +1,41 @@
 import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
+  console.log("Generating PWA Manifest...");
   return {
-    name: "MUDWASH Auto Detailers",
+    name: "MUDWASH Premium Detailing",
     short_name: "MUDWASH",
-    description: "Premium Auto Detailing Services",
+    description: "Professional mobile automotive detailing and ceramic coating services.",
     start_url: "/",
     display: "standalone",
     background_color: "#000000",
     theme_color: "#f69621",
+    orientation: "portrait",
     icons: [
       {
-        src: "/favicon.ico",
-        sizes: "any",
-        type: "image/x-icon",
+        src: "/icon-192x192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "any",
       },
-      // You should add larger icons (192x192, 512x512) here for full PWA support
+      {
+        src: "/icon-192x192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "maskable",
+      },
+      {
+        src: "/icon-512x512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/icon-512x512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
+      },
     ],
   };
 }

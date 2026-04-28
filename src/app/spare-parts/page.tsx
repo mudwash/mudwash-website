@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState, Suspense } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { Search, Filter, ShoppingCart, Star, Loader2 } from "lucide-react";
 import gsap from "gsap";
 import Navbar from "@/components/Navbar";
@@ -222,10 +223,13 @@ function SparePartsContent() {
                   >
                     {/* Image Section */}
                     <div className="relative aspect-[4/3] w-full overflow-hidden bg-white/5">
-                      <img
+                      <Image
                         src={part.image}
                         alt={part.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        fill
+                        priority={i < 5}
+                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw"
+                        className="object-cover group-hover:scale-110 transition-transform duration-700"
                       />
                     </div>
 

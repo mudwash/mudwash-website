@@ -5,8 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { Home, Heart, Plus, User, Bell, ShoppingBag, Calendar, MessageSquare, CalendarDays, Wrench, Download, Smartphone } from 'lucide-react';
 import gsap from 'gsap';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { auth } from '@/lib/firebase';
+import Dock from './Dock';
 
 interface NavLink {
   name: string;
@@ -15,11 +16,12 @@ interface NavLink {
   isCenter?: boolean;
 }
 
-const Navbar = () => {
+export default function Navbar() {
   const topNavRef = useRef<HTMLElement>(null);
   const bottomNavRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  
+  const router = useRouter();
+
   // PWA Install State
   const [isInstallable, setIsInstallable] = useState(false);
   const [showInstallModal, setShowInstallModal] = useState(false);
@@ -37,7 +39,7 @@ const Navbar = () => {
     if ((window as any).deferredPrompt) {
       setIsInstallable(true);
     }
-    
+
     const handleAppInstalled = () => {
       setIsInstallable(false);
       (window as any).deferredPrompt = null;
@@ -84,7 +86,7 @@ const Navbar = () => {
   return (
     <>
       {/* TOP HEADER (Desktop Floating Pill) */}
-      <div className="fixed top-6 left-0 w-full z-50 flex justify-center px-6">
+      <div className="hidden md:flex fixed top-6 left-0 w-full z-50 justify-center px-6">
         <nav
           ref={topNavRef}
           className="w-full max-w-6xl h-20 bg-[#0A0A0A]/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] flex items-center justify-between px-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-all duration-500"
@@ -99,7 +101,7 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Links */}
-          <div className="hidden lg:flex items-center gap-12">
+          <div className="hidden lg:flex items-center gap-8">
             {navLinks.filter(l => l.name !== 'Profile' && !l.isCenter).map((link) => {
               const isActive = pathname === link.href;
 
@@ -107,12 +109,12 @@ const Navbar = () => {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`text-[10px] font-black uppercase tracking-[0.4em] relative group transition-colors ${isActive ? 'text-brand-orange' : 'text-white/40 hover:text-white'}`}
+                  className={`text-[9px] font-black uppercase tracking-[0.2em] whitespace-nowrap relative group transition-colors ${isActive ? 'text-brand-orange' : 'text-white/40 hover:text-white'}`}
                 >
                   {link.name}
-                  
+
                   {isActive && (
-                    <motion.div 
+                    <motion.div
                       layoutId="nav-underline"
                       className="absolute -bottom-2 left-0 right-0 h-[2px] bg-brand-orange rounded-full shadow-[0_0_10px_#f69621]"
                     />
@@ -137,15 +139,15 @@ const Navbar = () => {
               <span className="hidden md:block ml-2 text-[10px] font-black uppercase tracking-[0.2em] text-white/60 group-hover:text-white transition-colors">App</span>
             </button>
 
-            <Link 
-              href={isLoggedIn ? "/profile" : "/sign-up"} 
+            <Link
+              href={isLoggedIn ? "/profile" : "/sign-up"}
               className="hidden md:flex items-center justify-center w-12 h-12 rounded-2xl border border-white/10 bg-white/5 hover:border-brand-orange/50 hover:bg-brand-orange/10 transition-all group"
             >
               <User size={18} className="text-white group-hover:text-brand-orange transition-colors" />
             </Link>
-            
-            <Link 
-              href="/bookings" 
+
+            <Link
+              href="/bookings"
               className="group relative flex items-center gap-3 bg-brand-orange text-black px-5 py-3 md:px-8 md:py-3.5 rounded-2xl font-black uppercase italic text-xs tracking-widest overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_10px_20px_rgba(246,150,33,0.2)]"
             >
               <CalendarDays size={18} className="shrink-0" />
@@ -157,62 +159,50 @@ const Navbar = () => {
         </nav>
       </div>
 
-      {/* PREMIUM DOCK BAR (Mobile) */}
-      <div 
+      {/* FLOATING DOCK (Mobile) */}
+      <div
         ref={bottomNavRef}
-        className="lg:hidden fixed bottom-6 left-6 right-6 z-[1000] flex justify-center"
+        className="lg:hidden fixed bottom-8 left-0 right-0 z-[1000] flex justify-center pointer-events-none"
       >
-        <div className="relative bg-[#111111]/90 backdrop-blur-3xl border border-white/10 flex justify-around items-center h-20 px-4 shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-[2.5rem] w-full max-w-md">
-          
-          {/* Active Spotlight */}
-          {navLinks.map((link) => {
-            const isActive = pathname === link.href;
-
-            return (
-              <button
-                key={link.name}
-                className={`relative flex flex-col items-center justify-center transition-all duration-500 z-20 flex-1 h-full`}
-              >
-                <Link href={link.href} className="absolute inset-0 z-30" />
-                
-                <motion.div 
-                  animate={{ 
-                    color: isActive ? (link.isCenter ? '#000000' : '#f69621') : '#555555',
-                    scale: isActive ? 1.1 : 1
-                  }}
-                  className={`relative flex items-center justify-center ${
-                    link.isCenter 
-                    ? `w-12 h-12 rounded-full border-2 transition-all duration-500 ${isActive ? 'bg-brand-orange border-brand-orange' : 'bg-transparent border-white/20'}` 
-                    : ''
-                  }`}
-                >
-                  {React.cloneElement(link.icon as any, { 
-                    strokeWidth: (isActive || link.isCenter) ? 2.5 : 2
-                  })}
-                </motion.div>
-              </button>
-            );
-          })}
+        <div className="pointer-events-auto">
+          <Dock
+            panelHeight={64}
+            baseItemSize={48}
+            magnification={60}
+            items={navLinks.map((link) => ({
+              icon: link.icon,
+              label: link.name,
+              onClick: () => {
+                if (link.name === 'Home' && pathname === '/') {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                  router.push(link.href);
+                }
+              },
+              isActive: pathname === link.href,
+              className: link.isCenter ? 'mx-2' : ''
+            }))}
+          />
         </div>
       </div>
       {/* INSTALL GUIDE MODAL */}
       <AnimatePresence>
         {showInstallModal && (
           <div className="fixed inset-0 z-[2000] flex items-center justify-center p-6">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowInstallModal(false)}
               className="absolute inset-0 bg-black/80 backdrop-blur-md"
             />
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               className="relative w-full max-w-md bg-[#0A0A0A] border border-white/10 rounded-[2.5rem] p-10 overflow-hidden shadow-2xl"
             >
-              <button 
+              <button
                 onClick={() => setShowInstallModal(false)}
                 className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors"
               >
@@ -237,8 +227,8 @@ const Navbar = () => {
                     <span className="text-white font-black uppercase italic text-xs tracking-widest">iOS (Safari)</span>
                   </div>
                   <p className="text-white/40 text-[11px] leading-relaxed">
-                    1. Tap the <span className="text-white">"Share"</span> button at the bottom of Safari.<br/>
-                    2. Scroll down and select <span className="text-white">"Add to Home Screen"</span>.<br/>
+                    1. Tap the <span className="text-white">"Share"</span> button at the bottom of Safari.<br />
+                    2. Scroll down and select <span className="text-white">"Add to Home Screen"</span>.<br />
                     3. Tap <span className="text-white">"Add"</span> to confirm.
                   </p>
                 </div>
@@ -252,13 +242,13 @@ const Navbar = () => {
                     <span className="text-white font-black uppercase italic text-xs tracking-widest">Android (Chrome)</span>
                   </div>
                   <p className="text-white/40 text-[11px] leading-relaxed">
-                    1. Tap the <span className="text-white">three dots</span> menu (⋮) in Chrome.<br/>
+                    1. Tap the <span className="text-white">three dots</span> menu (⋮) in Chrome.<br />
                     2. Select <span className="text-white">"Install App"</span> or "Add to Home Screen".
                   </p>
                 </div>
               </div>
 
-              <button 
+              <button
                 onClick={() => setShowInstallModal(false)}
                 className="w-full mt-8 bg-white text-black py-4 rounded-xl font-black uppercase italic text-xs tracking-[0.2em] transition-all hover:scale-105 active:scale-95"
               >
@@ -272,4 +262,3 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;

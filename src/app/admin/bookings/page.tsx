@@ -28,18 +28,22 @@ export default function BookingsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
+  const isMountedRef = useRef(true);
+
   useEffect(() => {
+    isMountedRef.current = true;
     fetchBookings();
+    return () => { isMountedRef.current = false; };
   }, []);
 
   const fetchBookings = async () => {
     try {
       const data = await getBookings();
-      setBookings(data);
+      if (isMountedRef.current) setBookings(data);
     } catch (error) {
       console.error("Error fetching bookings:", error);
     } finally {
-      setLoading(false);
+      if (isMountedRef.current) setLoading(false);
     }
   };
 

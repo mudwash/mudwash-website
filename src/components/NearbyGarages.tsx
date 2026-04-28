@@ -2,25 +2,55 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { Heart, Loader2 } from 'lucide-react';
 import { getGarages, Garage } from '@/lib/garages';
 
-const NearbyGarages = () => {
+const FALLBACK_GARAGES: Garage[] = [
+  { id: 'g1', name: "Al Quoz Detail Center", location: "Dubai, Al Quoz", distance: "2.4 km", image: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=2000&auto=format&fit=crop" },
+  { id: 'g2', name: "Marina Auto Care", location: "Dubai Marina", distance: "5.1 km", image: "https://images.unsplash.com/photo-1563720223185-11003d516935?q=80&w=2000&auto=format&fit=crop" },
+];
+
+export default function NearbyGarages() {
   const [garages, setGarages] = useState<Garage[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+    
+    const timeoutId = setTimeout(() => {
+      if (isMounted && loading) {
+        console.warn("NearbyGarages: Fetching timed out, using fallback.");
+        setGarages(FALLBACK_GARAGES);
+        setLoading(false);
+      }
+    }, 5000);
+
     const fetchGarages = async () => {
       try {
         const data = await getGarages();
-        setGarages(data);
+        if (isMounted) {
+          if (data && data.length > 0) {
+            setGarages(data);
+          } else {
+            setGarages(FALLBACK_GARAGES);
+          }
+        }
       } catch (error) {
         console.error("Error fetching garages:", error);
+        if (isMounted) setGarages(FALLBACK_GARAGES);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+          clearTimeout(timeoutId);
+        }
       }
     };
     fetchGarages();
+    return () => { 
+      isMounted = false; 
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   if (loading) {
@@ -50,7 +80,7 @@ const NearbyGarages = () => {
             className="flex-shrink-0 w-[280px] bg-[#1A1A1A] rounded-[2rem] overflow-hidden border border-white/5 shadow-2xl snap-center group"
           >
             <div className="relative h-40">
-              <img src={garage.image} alt={garage.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+              <Image src={garage.image || '/car-clean.png'} alt={garage.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" sizes="280px" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
               <button className="absolute top-4 right-4 p-2 bg-black/40 backdrop-blur-md rounded-full text-white/80 hover:text-brand-orange transition-colors">
                 <Heart size={16} />
@@ -72,4 +102,3 @@ const NearbyGarages = () => {
   );
 };
 
-export default NearbyGarages;

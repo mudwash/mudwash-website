@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { ChevronRight, Car, Shield, Sparkles, UserCheck, PhoneCall } from "lucide-react";
 import Link from "next/link";
 
@@ -104,10 +105,12 @@ export default function PremiumDetailing() {
             className="w-full lg:w-[62%] mt-[-40px] lg:mt-0"
           >
             <div className="relative aspect-[4/3] lg:aspect-[16/10] overflow-hidden rounded-[2.5rem] md:rounded-[3.5rem] shadow-2xl border border-white/5">
-              <img
+              <Image
                 src="https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?q=80&w=2000&auto=format&fit=crop"
                 alt="Premium Detailing"
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 800px"
               />
               <div className="absolute inset-0 bg-gradient-to-l from-black/40 via-transparent to-black/80" />
             </div>

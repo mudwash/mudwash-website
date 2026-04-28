@@ -6,6 +6,15 @@ const PWAInstall = dynamic(() => import("./PWAInstall"), {
   ssr: false,
 });
 
+const AppSplash = dynamic(() => import("./AppSplash"), {
+  ssr: false,
+});
+
 export default function PWAWrapper() {
-  return <PWAInstall />;
+  return (
+    <>
+      <AppSplash />
+      <PWAInstall />
+    </>
+  );
 }

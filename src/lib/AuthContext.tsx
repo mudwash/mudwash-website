@@ -19,26 +19,36 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
 });
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setLoading(true);
+      if (!isMounted) return;
+      
       if (firebaseUser) {
         setUser(firebaseUser);
-        const userProfile = await getUserProfile(firebaseUser.uid);
-        setProfile(userProfile);
+        try {
+          const userProfile = await getUserProfile(firebaseUser.uid);
+          if (isMounted) setProfile(userProfile);
+        } catch (error) {
+          console.error("Error fetching user profile:", error);
+        }
       } else {
         setUser(null);
         setProfile(null);
       }
-      setLoading(false);
+      if (isMounted) setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, []);
 
   const isAdmin = profile?.role === 'admin';
@@ -48,6 +58,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
 export const useAuth = () => useContext(AuthContext);

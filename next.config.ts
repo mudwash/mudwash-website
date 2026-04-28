@@ -6,18 +6,44 @@ const withPWA = withPWAInit({
   cacheOnFrontEndNav: true,
   aggressiveFrontEndNavCaching: true,
   reloadOnOnline: true,
-  disable: process.env.NODE_ENV === "development",
+  disable: process.env.NODE_ENV === 'development',
+  register: true,
+  skipWaiting: true,
   workboxOptions: {
     disableDevLogs: true,
   },
 });
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ['192.168.1.5', '192.168.1.5:3000', '192.168.1.7', '192.168.1.7:3000', '192.168.20.22', 'localhost:3000', '192.168.20.22:3000'],
+  allowedDevOrigins: [
+    '192.168.1.5', 
+    '192.168.1.5:3000', 
+    '192.168.1.7', 
+    '192.168.1.7:3000', 
+    '192.168.1.8', 
+    '192.168.1.8:3000', 
+    '192.168.20.22', 
+    'localhost:3000', 
+    '192.168.20.22:3000'
+  ],
   turbopack: {},
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.pinimg.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+      }
+    ],
+  },
   /* config options here */
 };
 
-
 export default withPWA(nextConfig);
-

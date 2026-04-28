@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 export default function BeforeAfterSlider() {
   const [sliderPosition, setSliderPosition] = useState(50);
@@ -88,20 +89,32 @@ export default function BeforeAfterSlider() {
           }}
         >
           {/* Dirty Car Image (Background) */}
-          <div 
-            className="absolute inset-0 bg-cover bg-center pointer-events-none"
-            style={{ backgroundImage: `url('/car-dirty.png')` }}
-          />
+          <div className="absolute inset-0 pointer-events-none">
+            <Image 
+              src="/car-dirty.png" 
+              alt="Dirty car" 
+              fill 
+              className="object-cover" 
+              sizes="(max-width: 1280px) 100vw, 1280px"
+            />
+          </div>
 
           {/* Clean Car Image (Clipped Overlay) - Removed transition to fix lag */}
           <div 
-            className="absolute inset-0 bg-cover bg-center pointer-events-none"
+            className="absolute inset-0 pointer-events-none z-10"
             style={{ 
-              backgroundImage: `url('/car-clean.png')`,
               clipPath: `polygon(${sliderPosition}% 0, 100% 0, 100% 100%, ${sliderPosition}% 100%)`,
               WebkitClipPath: `polygon(${sliderPosition}% 0, 100% 0, 100% 100%, ${sliderPosition}% 100%)`
             }}
-          />
+          >
+            <Image 
+              src="/car-clean.png" 
+              alt="Clean car" 
+              fill 
+              className="object-cover" 
+              sizes="(max-width: 1280px) 100vw, 1280px"
+            />
+          </div>
 
           {/* Slider Handle Line */}
           <div 

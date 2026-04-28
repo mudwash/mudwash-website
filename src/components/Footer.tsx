@@ -5,7 +5,7 @@ import { Phone, MapPin, Mail, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
-const Footer = () => {
+export default function Footer() {
   return (
     <footer className="relative w-full bg-[#050505] overflow-hidden pt-20 border-t border-white/5">
       {/* Background Glowing Effects */}
@@ -130,4 +130,3 @@ const Footer = () => {
   );
 };
 
-export default Footer;

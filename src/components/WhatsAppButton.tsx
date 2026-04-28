@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
 
-const WhatsAppButton = () => {
+export default function WhatsAppButton() {
   const phoneNumber = '971502374199';
   const message = 'hai mudwash';
   const encodedMessage = encodeURIComponent(message);
@@ -40,4 +40,3 @@ const WhatsAppButton = () => {
   );
 };
 
-export default WhatsAppButton;

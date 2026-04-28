@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 
-export const AdminGuard = ({ children }: { children: React.ReactNode }) => {
+export function AdminGuard({ children }: { children: React.ReactNode }) {
   const { user, isAdmin, loading } = useAuth();
   const router = useRouter();
 
@@ -28,9 +28,9 @@ export const AdminGuard = ({ children }: { children: React.ReactNode }) => {
   }
 
   return <>{children}</>;
-};
+}
 
-export const UserGuard = ({ children }: { children: React.ReactNode }) => {
+export function UserGuard({ children }: { children: React.ReactNode }) {
   const { user, isAdmin, loading } = useAuth();
   const router = useRouter();
 
@@ -58,4 +58,4 @@ export const UserGuard = ({ children }: { children: React.ReactNode }) => {
   }
 
   return <>{children}</>;
-};
+}

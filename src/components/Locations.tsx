@@ -2,9 +2,10 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { MapPin } from "lucide-react";
 
-const Locations = () => {
+export default function Locations() {
   return (
     <section className="relative w-full py-32 bg-[#020202] overflow-hidden">
       {/* Immersive Background Elements */}
@@ -32,12 +33,14 @@ const Locations = () => {
             transition={{ duration: 1 }}
             className="w-full lg:w-1/2 relative flex justify-center"
           >
-            <div className="relative group w-full max-w-[500px]">
+            <div className="relative group w-full max-w-[500px] aspect-[4/5] sm:aspect-square">
               <div className="absolute -inset-4 bg-brand-orange/10 blur-3xl rounded-[3rem] opacity-50" />
-              <img
+              <Image
                 src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1200"
                 alt="Luxury Car Detail"
-                className="relative rounded-[2.5rem] border border-white/10 shadow-2xl grayscale-[0.3] group-hover:grayscale-0 transition-all duration-1000 object-cover aspect-square w-full"
+                fill
+                sizes="(max-width: 768px) 100vw, 500px"
+                className="relative rounded-[2.5rem] border border-white/10 shadow-2xl grayscale-[0.3] group-hover:grayscale-0 transition-all duration-1000 object-cover"
               />
               <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
               
@@ -134,4 +137,3 @@ const Locations = () => {
   );
 };
 
-export default Locations;

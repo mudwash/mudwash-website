@@ -5,15 +5,15 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import BookingModal from "@/components/BookingModal";
 import { getServices, Service } from "@/lib/services";
-import { 
-  Loader2, 
-  Droplets, 
-  Zap, 
-  Snowflake, 
-  Waves, 
-  Wrench, 
-  Settings, 
-  Disc, 
+import {
+  Loader2,
+  Droplets,
+  Zap,
+  Snowflake,
+  Waves,
+  Wrench,
+  Settings,
+  Disc,
   Car,
   ShieldCheck,
   Clock,
@@ -25,13 +25,13 @@ import {
 } from "lucide-react";
 
 const IconMap: Record<string, React.ElementType> = {
-  Droplets, 
-  Zap, 
-  Snowflake, 
-  Waves, 
-  Wrench, 
-  Settings, 
-  Disc, 
+  Droplets,
+  Zap,
+  Snowflake,
+  Waves,
+  Wrench,
+  Settings,
+  Disc,
   Car,
   ShieldCheck,
   Clock,
@@ -46,7 +46,7 @@ const getIconForService = (service: Service) => {
   const name = service.name.toLowerCase();
   const iconField = (service.icon || "").toLowerCase();
   const source = `${name} ${iconField}`;
-  
+
   // 1. Smart Keyword Detection (Prioritized for better look)
   if (source.includes("inspection") || source.includes("checkup")) return <Search className="text-[#A0C2C2]" size={32} />;
   if (source.includes("suspension") || source.includes("spring") || source.includes("shock")) return <Activity className="text-brand-orange" size={32} />;
@@ -75,36 +75,67 @@ const getIconForService = (service: Service) => {
     const IconComponent = IconMap[lucideMatch];
     return <IconComponent className="text-brand-orange" size={32} />;
   }
-  
+
   return <Wrench className="text-brand-orange/50" size={32} />; // Default
 };
 
-// Removed static servicesData as we are using Firebase services
+const FALLBACK_SERVICES: Service[] = [
+  { id: 'f1', name: "Exterior detailing", price: "AED 150", duration: "1.5h", category: "Washing", description: "Premium outside wash", active: true, icon: "Waves" },
+  { id: 'f2', name: "Interior cleaning", price: "AED 200", duration: "2h", category: "Cleaning", description: "Deep inside cleaning", active: true, icon: "Car" },
+  { id: 'f3', name: "Ceramic Coating", price: "AED 1200", duration: "6h", category: "Protection", description: "Nanotech protection", active: true, icon: "ShieldCheck" },
+  { id: 'f4', name: "Engine cleaning", price: "AED 100", duration: "1h", category: "Washing", description: "Engine bay detail", active: true, icon: "Settings2" },
+  { id: 'f5', name: "Paint correction", price: "AED 800", duration: "4h", category: "Polishing", description: "Fixing swirl marks", active: true, icon: "Sparkles" },
+  { id: 'f6', name: "Leather conditioning", price: "AED 180", duration: "1.5h", category: "Interior", description: "Premium leather care", active: true, icon: "Layers" },
+];
 
-const ServicesGrid = () => {
+export default function ServicesGrid() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedService, setSelectedService] = useState("");
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        console.log("ServicesGrid: Fetching services...");
-        const data = await getServices(true); // only active
-        console.log("ServicesGrid: Received data:", data);
-        setServices(data);
-      } catch (error: any) {
-        console.error("ServicesGrid: Error fetching services:", error);
-      } finally {
+    let isMounted = true;
+    
+    // Safety timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      if (isMounted && loading) {
+        console.warn("ServicesGrid: Fetching services timed out, using fallback data.");
+        setServices(FALLBACK_SERVICES);
         setLoading(false);
       }
+    }, 5000);
+
+    const fetchServices = async () => {
+      try {
+        const data = await getServices(true);
+        if (isMounted) {
+          if (data && data.length > 0) {
+            setServices(data);
+          } else {
+            setServices(FALLBACK_SERVICES);
+          }
+        }
+      } catch (error: any) {
+        console.error("ServicesGrid: Error fetching services:", error);
+        if (isMounted) setServices(FALLBACK_SERVICES);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+          clearTimeout(timeoutId);
+        }
+      }
     };
+
     fetchServices();
+    return () => { 
+      isMounted = false; 
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   return (
-    <section className="py-12 px-4 md:px-6 bg-[#0A0A0A] w-full">
+    <section className="pt-0 pb-12 md:py-12 px-4 md:px-6 bg-[#0A0A0A] w-full">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-xl md:text-2xl text-white font-bold tracking-tight">
@@ -131,7 +162,7 @@ const ServicesGrid = () => {
             </Link>
           </div>
         ) : (
-          <div className="flex md:grid md:grid-cols-6 lg:grid-cols-8 gap-4 md:gap-6 overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 scrollbar-hide snap-x">
+          <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 md:gap-6 pb-4 md:pb-0">
             {services.slice(0, 8).map((service, index) => (
               <motion.div
                 key={service.id}
@@ -139,7 +170,7 @@ const ServicesGrid = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.05, duration: 0.3 }}
-                className="flex flex-col items-center gap-2 group cursor-pointer flex-shrink-0 w-[85px] md:w-auto snap-start"
+                className="flex flex-col items-center gap-2 group cursor-pointer w-full"
                 onClick={() => {
                   setSelectedService(service.name);
                   setIsModalOpen(true);
@@ -162,13 +193,12 @@ const ServicesGrid = () => {
           </div>
         )}
       </div>
-      <BookingModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        serviceName={selectedService} 
+      <BookingModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        serviceName={selectedService}
       />
     </section>
   );
 };
 
-export default ServicesGrid;

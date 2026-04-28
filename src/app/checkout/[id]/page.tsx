@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Script from "next/script";
+import Image from "next/image";
 import { 
   ChevronLeft, 
   CreditCard, 
@@ -374,8 +375,8 @@ export default function CheckoutPage() {
 
               <div className="space-y-6">
                 <div className="flex gap-5">
-                  <div className="w-20 h-20 bg-white/5 rounded-2xl overflow-hidden flex-shrink-0 border border-white/5">
-                    {part.image && <img src={part.image} alt={part.name} className="w-full h-full object-cover" />}
+                  <div className="w-20 h-20 bg-white/5 rounded-2xl overflow-hidden flex-shrink-0 border border-white/5 relative">
+                    {part.image && <Image src={part.image} alt={part.name} fill className="object-cover" sizes="80px" priority />}
                   </div>
                   <div className="flex flex-col justify-center">
                     <p className="text-xs font-black uppercase tracking-widest text-brand-orange mb-1">{part.category}</p>

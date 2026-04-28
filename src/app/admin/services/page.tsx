@@ -43,18 +43,22 @@ export default function ServicesPage() {
     active: true
   });
 
+  const isMountedRef = useRef(true);
+
   useEffect(() => {
+    isMountedRef.current = true;
     fetchServices();
+    return () => { isMountedRef.current = false; };
   }, []);
 
   const fetchServices = async () => {
     try {
       const data = await getServices();
-      setServices(data);
+      if (isMountedRef.current) setServices(data);
     } catch (error) {
       console.error("Error fetching services:", error);
     } finally {
-      setLoading(false);
+      if (isMountedRef.current) setLoading(false);
     }
   };
 
