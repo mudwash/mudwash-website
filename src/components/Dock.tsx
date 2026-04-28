@@ -123,7 +123,7 @@ function DockItem({
         transition={{ type: 'spring', stiffness: 400, damping: 15 }}
         style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       >
-        {React.cloneElement(icon as React.ReactElement, { 
+        {React.cloneElement(icon as React.ReactElement<any>, { 
           size: 24, 
           strokeWidth: isActive ? 3 : 2,
           color: isActive ? '#000000' : '#ffffff'
