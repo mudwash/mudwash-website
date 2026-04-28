@@ -80,12 +80,12 @@ const getIconForService = (service: Service) => {
 };
 
 const FALLBACK_SERVICES: Service[] = [
-  { id: 'f1', name: "Exterior detailing", price: "AED 150", duration: "1.5h", category: "Washing", description: "Premium outside wash", active: true, icon: "Waves" },
-  { id: 'f2', name: "Interior cleaning", price: "AED 200", duration: "2h", category: "Cleaning", description: "Deep inside cleaning", active: true, icon: "Car" },
-  { id: 'f3', name: "Ceramic Coating", price: "AED 1200", duration: "6h", category: "Protection", description: "Nanotech protection", active: true, icon: "ShieldCheck" },
-  { id: 'f4', name: "Engine cleaning", price: "AED 100", duration: "1h", category: "Washing", description: "Engine bay detail", active: true, icon: "Settings2" },
-  { id: 'f5', name: "Paint correction", price: "AED 800", duration: "4h", category: "Polishing", description: "Fixing swirl marks", active: true, icon: "Sparkles" },
-  { id: 'f6', name: "Leather conditioning", price: "AED 180", duration: "1.5h", category: "Interior", description: "Premium leather care", active: true, icon: "Layers" },
+  { id: 'f1', name: "Exterior detailing", price: "AED 150", duration: "1.5h", category: "Washing", description: "Premium outside wash", active: true, icon: "Waves", image: "" },
+  { id: 'f2', name: "Interior cleaning", price: "AED 200", duration: "2h", category: "Cleaning", description: "Deep inside cleaning", active: true, icon: "Car", image: "" },
+  { id: 'f3', name: "Ceramic Coating", price: "AED 1200", duration: "6h", category: "Protection", description: "Nanotech protection", active: true, icon: "ShieldCheck", image: "" },
+  { id: 'f4', name: "Engine cleaning", price: "AED 100", duration: "1h", category: "Washing", description: "Engine bay detail", active: true, icon: "Settings2", image: "" },
+  { id: 'f5', name: "Paint correction", price: "AED 800", duration: "4h", category: "Polishing", description: "Fixing swirl marks", active: true, icon: "Sparkles", image: "" },
+  { id: 'f6', name: "Leather conditioning", price: "AED 180", duration: "1.5h", category: "Interior", description: "Premium leather care", active: true, icon: "Layers", image: "" },
 ];
 
 export default function ServicesGrid() {
