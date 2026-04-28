@@ -8,9 +8,9 @@ const withPWA = withPWAInit({
   reloadOnOnline: true,
   disable: process.env.NODE_ENV === 'development',
   register: true,
-  skipWaiting: true,
   workboxOptions: {
     disableDevLogs: true,
+    skipWaiting: true,
   },
 });
 
