@@ -20,9 +20,76 @@ import {
   Settings, 
   Disc, 
   Car,
-  ShieldCheck
+  ShieldCheck,
+  Package,
+  SprayCan,
+  Brush,
+  Wind,
+  Sun,
+  Shield,
+  Crown,
+  Diamond,
+  Star,
+  Flame,
+  Award,
+  BadgeCheck,
+  CheckCircle,
+  Clock3,
+  Timer,
+  Fuel,
+  Gauge,
+  MapPin as MapPinIcon,
+  Navigation,
+  Smartphone,
+  Trophy,
+  Activity,
+  Heart,
+  Palette,
+  Droplet,
+  GlassWater,
+  CloudRain
 } from "lucide-react";
 import { getServices, addService, updateService, deleteService, Service } from "@/lib/services";
+
+const ICON_OPTIONS = [
+  { id: "Wrench", icon: Wrench },
+  { id: "Droplets", icon: Droplets },
+  { id: "Zap", icon: Zap },
+  { id: "Snowflake", icon: Snowflake },
+  { id: "Waves", icon: Waves },
+  { id: "Settings", icon: Settings },
+  { id: "Disc", icon: Disc },
+  { id: "Car", icon: Car },
+  { id: "ShieldCheck", icon: ShieldCheck },
+  { id: "Clock", icon: Clock },
+  { id: "Sparkles", icon: Sparkles },
+  { id: "Package", icon: Package },
+  { id: "SprayCan", icon: SprayCan },
+  { id: "Brush", icon: Brush },
+  { id: "Wind", icon: Wind },
+  { id: "Sun", icon: Sun },
+  { id: "Shield", icon: Shield },
+  { id: "Crown", icon: Crown },
+  { id: "Diamond", icon: Diamond },
+  { id: "Star", icon: Star },
+  { id: "Flame", icon: Flame },
+  { id: "Award", icon: Award },
+  { id: "BadgeCheck", icon: BadgeCheck },
+  { id: "CheckCircle", icon: CheckCircle },
+  { id: "Clock3", icon: Clock3 },
+  { id: "Timer", icon: Timer },
+  { id: "Fuel", icon: Fuel },
+  { id: "Gauge", icon: Gauge },
+  { id: "Navigation", icon: Navigation },
+  { id: "Smartphone", icon: Smartphone },
+  { id: "Trophy", icon: Trophy },
+  { id: "Activity", icon: Activity },
+  { id: "Heart", icon: Heart },
+  { id: "Palette", icon: Palette },
+  { id: "Droplet", icon: Droplet },
+  { id: "GlassWater", icon: GlassWater },
+  { id: "CloudRain", icon: CloudRain },
+];
 
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
@@ -165,19 +232,19 @@ export default function ServicesPage() {
           <Loader2 className="animate-spin text-brand-orange" size={32} />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
           {services.map((service, idx) => (
             <motion.div
               key={service.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
-              className="bg-[#0A0A0A] border border-white/5 rounded-2xl overflow-hidden group hover:border-white/10 transition-colors relative flex flex-col"
+              className="bg-[#0A0A0A] border border-white/5 rounded-2xl overflow-hidden group hover:border-white/10 transition-colors relative flex flex-col h-full shadow-2xl"
             >
               {/* Icon/Image Preview */}
-              <div className="h-40 bg-white/5 relative flex items-center justify-center">
+              <div className="h-24 sm:h-40 bg-white/5 relative flex items-center justify-center">
                 <div className="absolute inset-0 opacity-20 bg-gradient-to-br from-brand-orange/20 to-transparent" />
-                <div className="relative z-10 scale-[2.5]">
+                <div className="relative z-10 scale-[1.2] sm:scale-[2.5]">
                   {(() => {
                     const iconSource = (service.icon || service.name).toLowerCase();
                     const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/;
@@ -199,42 +266,42 @@ export default function ServicesPage() {
                     return <Wrench className="text-white/20" />;
                   })()}
                 </div>
-                <div className="absolute top-4 right-4 flex items-center gap-2">
-                  <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${service.active ? 'bg-emerald-500/20 text-emerald-500' : 'bg-white/10 text-white/30'}`}>
+                <div className="absolute top-2 right-2 sm:top-4 sm:right-4 flex items-center gap-2">
+                  <span className={`px-1.5 py-0.5 sm:px-2 sm:py-1 rounded text-[8px] sm:text-[10px] font-black uppercase tracking-wider ${service.active ? 'bg-emerald-500/20 text-emerald-500' : 'bg-white/10 text-white/30'}`}>
                     {service.active ? "Active" : "Draft"}
                   </span>
                 </div>
               </div>
 
-              <div className="p-6 flex-1 flex flex-col space-y-4">
+              <div className="p-3 sm:p-6 flex-1 flex flex-col space-y-3 sm:space-y-4">
                 <div>
-                  <h3 className="text-xl font-bold text-white mb-1">{service.name}</h3>
-                  <p className="text-white/40 text-xs leading-relaxed line-clamp-2">{service.description}</p>
+                  <h3 className="text-sm sm:text-xl font-black text-white italic uppercase tracking-tight mb-0.5 sm:mb-1 line-clamp-1">{service.name}</h3>
+                  <p className="text-white/40 text-[9px] sm:text-xs leading-tight sm:leading-relaxed line-clamp-1 sm:line-clamp-2 font-medium">{service.description}</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5 mt-auto">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 pt-3 sm:pt-4 border-t border-white/5 mt-auto">
                   <div>
-                    <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Base Price</p>
-                    <p className="text-lg font-bold text-brand-orange">{service.price}</p>
+                    <p className="text-[8px] sm:text-[10px] font-black text-white/20 uppercase tracking-widest mb-0.5 sm:mb-1">Price</p>
+                    <p className="text-sm sm:text-lg font-black text-brand-orange tracking-tighter leading-none">{service.price}</p>
                   </div>
-                  <div>
-                    <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Duration</p>
-                    <p className="text-lg font-bold text-white">{service.duration}</p>
+                  <div className="hidden sm:block">
+                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest mb-1">Duration</p>
+                    <p className="text-lg font-black text-white tracking-tighter leading-none">{service.duration}</p>
                   </div>
                 </div>
 
-                <div className="flex gap-3 pt-4">
+                <div className="flex flex-col sm:flex-row gap-2 pt-1 sm:pt-2">
                   <button 
                     onClick={() => handleEdit(service)}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold transition-all"
+                    className="flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-[9px] sm:text-xs font-black uppercase tracking-widest transition-all"
                   >
-                    <Edit2 size={14} /> Edit
+                    <Edit2 size={12} className="sm:w-3.5 sm:h-3.5" /> Edit
                   </button>
                   <button 
                     onClick={() => service.id && handleDelete(service.id)}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-500/5 hover:bg-red-500/10 text-red-500/50 hover:text-red-500 text-xs font-bold transition-all"
+                    className="flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 rounded-xl bg-red-500/5 hover:bg-red-500/10 text-red-500/50 hover:text-red-500 text-[9px] sm:text-xs font-black uppercase tracking-widest transition-all"
                   >
-                    <Trash2 size={14} /> Delete
+                    <Trash2 size={12} className="sm:w-3.5 sm:h-3.5" /> Delete
                   </button>
                 </div>
               </div>
@@ -247,14 +314,14 @@ export default function ServicesPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-[#050505] border-2 border-dashed border-white/5 rounded-2xl p-6 flex flex-col items-center justify-center gap-4 hover:border-brand-orange/20 hover:bg-brand-orange/[0.02] transition-all group min-h-[300px]"
+            className="bg-[#050505] border-2 border-dashed border-white/5 rounded-2xl p-4 sm:p-6 flex flex-col items-center justify-center gap-3 sm:gap-4 hover:border-brand-orange/20 hover:bg-brand-orange/[0.02] transition-all group min-h-[200px] sm:min-h-[300px]"
           >
-            <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Plus size={24} className="text-white/20 group-hover:text-brand-orange" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Plus size={20} className="text-white/20 group-hover:text-brand-orange" />
             </div>
             <div className="text-center">
-              <p className="font-bold text-sm text-white/40 group-hover:text-white">Create New Service</p>
-              <p className="text-[10px] text-white/20 group-hover:text-white/40">Add a new washing plan to your menu</p>
+              <p className="font-black text-[10px] sm:text-sm text-white/40 group-hover:text-white uppercase tracking-widest">New Service</p>
+              <p className="hidden sm:block text-[10px] text-white/20 group-hover:text-white/40 mt-1">Add a new washing plan</p>
             </div>
           </motion.button>
         </div>
@@ -344,38 +411,52 @@ export default function ServicesPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between px-1">
-                    <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Icon / Keyword</label>
-                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center">
-                      {(() => {
-                        const iconSource = (formData.icon || formData.name).toLowerCase();
-                        const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/;
-                        if (emojiRegex.test(formData.icon || "")) {
-                          return <span className="text-xl">{formData.icon}</span>;
-                        }
-                        const IconMap: any = { Droplets, Zap, Snowflake, Waves, Wrench, Settings, Disc, Car, ShieldCheck, Clock };
-                        const lucideMatch = Object.keys(IconMap).find(k => k.toLowerCase() === iconSource);
-                        const IconComp = lucideMatch ? IconMap[lucideMatch] : Wrench;
-                        return <IconComp size={20} className={lucideMatch ? "text-brand-orange" : "text-white/20"} />;
-                      })()}
+                  <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest px-1">Select Icon</label>
+                  
+                  <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                    {ICON_OPTIONS.map((opt) => {
+                      const IconComp = opt.icon;
+                      const isSelected = formData.icon === opt.id;
+                      return (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, icon: opt.id })}
+                          className={`aspect-square rounded-xl border flex items-center justify-center transition-all ${
+                            isSelected 
+                              ? "bg-brand-orange border-brand-orange text-black scale-105 shadow-lg shadow-brand-orange/20" 
+                              : "bg-white/5 border-white/5 text-white/40 hover:border-white/10 hover:text-white"
+                          }`}
+                        >
+                          <IconComp size={20} />
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="pt-2">
+                    <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest px-1">Custom Keyword or Emoji</label>
+                    <div className="mt-2 flex gap-3">
+                      <input 
+                        type="text" 
+                        placeholder="e.g. 🔥 or Engine"
+                        value={formData.icon}
+                        onChange={(e) => setFormData({...formData, icon: e.target.value})}
+                        className="flex-1 bg-[#050505] border border-white/5 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-orange transition-all"
+                      />
+                      <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center flex-shrink-0">
+                         {(() => {
+                            const iconSource = (formData.icon || "").toLowerCase();
+                            const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/;
+                            if (emojiRegex.test(formData.icon || "")) return <span className="text-xl">{formData.icon}</span>;
+                            const IconMap: any = { Droplets, Zap, Snowflake, Waves, Wrench, Settings, Disc, Car, ShieldCheck, Clock, Sparkles, Package };
+                            const lucideMatch = Object.keys(IconMap).find(k => k.toLowerCase() === iconSource);
+                            const IconComp = lucideMatch ? IconMap[lucideMatch] : Wrench;
+                            return <IconComp size={20} className={lucideMatch ? "text-brand-orange" : "text-white/20"} />;
+                          })()}
+                      </div>
                     </div>
                   </div>
-                  <input 
-                    type="text" 
-                    placeholder="e.g. wash, repair, or paste an emoji"
-                    value={formData.icon}
-                    onChange={(e) => {
-                      const val = e.target.value.trim();
-                      // Simple validation: only allow one "word" or one emoji
-                      if (val.split(/\s+/).length <= 1) {
-                        setFormData({...formData, icon: val});
-                      }
-                    }}
-                    className="w-full bg-[#050505] border border-white/5 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-orange transition-all"
-                  />
-                  <p className="text-[9px] text-white/20 px-1 italic">
-                    Type a keyword (wash, oil, engine), a Lucide name (Wrench, Disc), or paste a single Emoji.
-                  </p>
                 </div>
 
                 <div className="space-y-2">

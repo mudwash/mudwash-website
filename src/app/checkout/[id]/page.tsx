@@ -20,7 +20,7 @@ import {
   Mail,
   Loader2
 } from "lucide-react";
-import Navbar from "@/components/Navbar";
+
 import Footer from "@/components/Footer";
 import { getParts, Part } from "@/lib/parts";
 import { auth } from "@/lib/firebase";
@@ -189,7 +189,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-white">
-      <Navbar />
+
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-24 md:py-32 lg:py-40">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">

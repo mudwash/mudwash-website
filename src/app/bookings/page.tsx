@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Navbar from '@/components/Navbar';
+
 import Footer from '@/components/Footer';
 import { ShieldCheck, Clock, Zap, MapPin } from 'lucide-react';
 
@@ -82,7 +82,7 @@ export default function BookingPage() {
 
   return (
     <>
-      <Navbar />
+
       <main className="min-h-screen bg-[#0A0A0A] pt-32 pb-24 px-6 md:px-12 lg:px-24 flex items-center">
         
         <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">

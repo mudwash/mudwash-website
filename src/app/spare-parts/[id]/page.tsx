@@ -20,7 +20,7 @@ import {
   Smartphone
 } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
-import Navbar from "@/components/Navbar";
+
 import Footer from "@/components/Footer";
 import { getParts, Part } from "@/lib/parts";
 import { auth } from "@/lib/firebase";
@@ -81,7 +81,7 @@ export default function ProductDetailPage() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-white">
-      <Navbar />
+
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-24 md:py-32 lg:py-40">
         {/* Back Button */}

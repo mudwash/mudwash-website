@@ -68,3 +68,10 @@ export const updateBookingStatus = async (id: string, status: Booking["status"])
   await updateDoc(bookingRef, { status });
 };
 
+export const deleteBooking = async (id: string) => {
+  const { deleteDoc } = await import("firebase/firestore");
+  const bookingRef = doc(db, COLLECTION_NAME, id);
+  await deleteDoc(bookingRef);
+};
+
+

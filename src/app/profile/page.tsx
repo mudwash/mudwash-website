@@ -18,7 +18,7 @@ import {
   Edit3,
   Calendar
 } from "lucide-react";
-import Navbar from "@/components/Navbar";
+
 import Footer from "@/components/Footer";
 import { auth } from "@/lib/firebase";
 import { getUserBookings, Booking } from "@/lib/bookings";
@@ -66,7 +66,7 @@ export default function ProfilePage() {
   return (
     <UserGuard>
       <div className="min-h-screen bg-[#050505] text-white">
-        <Navbar />
+
         
         <main className="max-w-7xl mx-auto px-4 sm:px-6 py-24 md:py-32 lg:py-40">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">

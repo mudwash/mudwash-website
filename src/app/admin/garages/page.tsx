@@ -100,17 +100,19 @@ export default function AdminGarages() {
           <h1 className="text-3xl font-bold mb-2">Garages</h1>
           <p className="text-white/40 text-sm font-medium">Manage and add nearby garages for your customers.</p>
         </div>
-        <button 
-          onClick={() => {
-            setEditingGarage(null);
-            setFormData({ name: "", image: "", distance: "", location: "" });
-            setIsModalOpen(true);
-          }}
-          className="bg-brand-orange text-black px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-white transition-colors"
-        >
-          <Plus size={18} />
-          <span>Add New Garage</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => {
+              setEditingGarage(null);
+              setFormData({ name: "", image: "", distance: "", location: "" });
+              setIsModalOpen(true);
+            }}
+            className="bg-brand-orange text-black px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-white transition-colors"
+          >
+            <Plus size={18} />
+            <span>Add Garage</span>
+          </button>
+        </div>
       </div>
 
       {/* Search */}
@@ -136,47 +138,47 @@ export default function AdminGarages() {
           <p>No garages found. Start by adding one!</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
           {filteredGarages.map((garage) => (
             <motion.div
               layout
               key={garage.id}
-              className="bg-[#0A0A0A] border border-white/5 rounded-2xl overflow-hidden group hover:border-white/20 transition-all"
+              className="bg-[#0A0A0A] border border-white/5 rounded-2xl overflow-hidden group hover:border-white/20 transition-all flex flex-col h-full shadow-2xl"
             >
-              <div className="relative h-48">
+              <div className="relative h-28 sm:h-48">
                 <img 
                   src={garage.image} 
                   alt={garage.name} 
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
-                <div className="absolute bottom-4 left-4">
-                  <span className="bg-brand-orange text-black text-[10px] font-black px-2 py-1 rounded uppercase tracking-wider">
+                <div className="absolute bottom-2 left-2 sm:bottom-4 sm:left-4">
+                  <span className="bg-brand-orange text-black text-[8px] sm:text-[10px] font-black px-1.5 py-0.5 sm:px-2 sm:py-1 rounded uppercase tracking-wider">
                     {garage.distance}
                   </span>
                 </div>
               </div>
-              <div className="p-6 space-y-4">
+              <div className="p-3 sm:p-6 space-y-3 sm:space-y-4 flex-1 flex flex-col">
                 <div>
-                  <h3 className="text-lg font-bold text-white mb-1">{garage.name}</h3>
-                  <p className="text-white/40 text-xs flex items-center gap-1.5">
-                    <MapPin size={12} className="text-brand-orange" />
+                  <h3 className="text-sm sm:text-lg font-bold text-white mb-0.5 sm:mb-1 line-clamp-1">{garage.name}</h3>
+                  <p className="text-white/40 text-[9px] sm:text-xs flex items-center gap-1 line-clamp-1">
+                    <MapPin size={10} className="text-brand-orange shrink-0" />
                     {garage.location || "Location not specified"}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 pt-2">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1 sm:pt-2 mt-auto">
                   <button 
                     onClick={() => openEditModal(garage)}
-                    className="flex-1 bg-white/5 hover:bg-white/10 text-white py-2.5 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-2"
+                    className="flex-1 bg-white/5 hover:bg-white/10 text-white py-2 sm:py-2.5 rounded-lg text-[10px] sm:text-xs font-bold transition-colors flex items-center justify-center gap-1.5 sm:gap-2"
                   >
-                    <Edit2 size={14} />
+                    <Edit2 size={12} className="sm:w-3.5 sm:h-3.5" />
                     Edit
                   </button>
                   <button 
                     onClick={() => garage.id && handleDelete(garage.id)}
-                    className="p-2.5 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-lg transition-all"
+                    className="p-2 sm:p-2.5 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-lg transition-all flex items-center justify-center"
                   >
-                    <Trash2 size={16} />
+                    <Trash2 size={14} className="sm:w-4 sm:h-4" />
                   </button>
                 </div>
               </div>

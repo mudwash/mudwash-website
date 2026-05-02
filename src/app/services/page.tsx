@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, Variants } from "framer-motion";
-import Navbar from "@/components/Navbar";
+
 import Footer from "@/components/Footer";
 import BookingModal from "@/components/BookingModal";
 import { useRouter } from "next/navigation";
@@ -111,19 +111,22 @@ export default function ServicesPage() {
 
   return (
     <>
-      <Navbar />
-      <main className="min-h-screen bg-[#111111] pt-32 pb-32 px-6">
+
+      <main className="min-h-screen bg-[#111111] pt-20 md:pt-32 pb-24 px-6">
         <div className="w-full mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="mb-12 text-left"
+            className="mb-16 text-left"
           >
-            <h1 className="text-3xl md:text-5xl lg:text-5xl font-bold text-white leading-tight max-w-3xl">
-              Transform your car with our complete range of premium detailing
-              and maintenance services.
+            <h1 className="text-2xl md:text-4xl lg:text-5xl font-black text-white italic uppercase tracking-tighter leading-[0.9] max-w-2xl">
+              Premium <span className="text-brand-orange">Auto Care</span> <br />
+              Services & Detailing.
             </h1>
+            <p className="text-white/40 text-sm md:text-base mt-4 max-w-xl font-medium">
+              Transform your car with our complete range of premium detailing and high-performance maintenance services.
+            </p>
           </motion.div>
 
           {loading ? (
@@ -158,12 +161,12 @@ export default function ServicesPage() {
               initial="hidden"
               animate="show"
             >
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
                 {services.map((service) => (
                   <motion.div
                     key={service.id}
                     variants={itemVariants}
-                    className="relative aspect-square md:aspect-[4/3] rounded-3xl bg-[#1A1A1A] border border-white/5 overflow-hidden group cursor-pointer flex flex-col items-center justify-center gap-4 transition-all hover:bg-[#222222]"
+                    className="relative p-4 sm:p-7 rounded-[1.5rem] sm:rounded-[2.5rem] bg-[#1A1A1A] border border-white/5 overflow-hidden group cursor-pointer transition-all hover:bg-[#222222] hover:border-brand-orange/30 flex flex-col gap-3 sm:gap-5 shadow-2xl"
                     onClick={() => {
                       const user = auth.currentUser;
                       if (!user) {
@@ -174,18 +177,39 @@ export default function ServicesPage() {
                       }
                     }}
                   >
-                    {/* Icon Container */}
-                    <div className="p-4 rounded-2xl bg-white/5 group-hover:bg-brand-orange/10 transition-colors">
-                      {getIconForService(service)}
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-start gap-2">
+                      <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-brand-orange/10 transition-colors shrink-0">
+                        {getIconForService(service)}
+                      </div>
+                      <div className="text-left sm:text-right">
+                        <div className="text-brand-orange font-black text-sm sm:text-xl tracking-tighter leading-none">
+                          ₹{service.price}
+                        </div>
+                        <div className="flex items-center justify-start sm:justify-end gap-1 text-white/30 text-[8px] sm:text-[9px] font-black uppercase tracking-widest mt-1">
+                          <Clock size={8} />
+                          {service.duration}
+                        </div>
+                      </div>
                     </div>
                     
-                    {/* Text */}
-                    <h3 className="text-white font-bold text-xs md:text-sm lg:text-base tracking-wide z-10 transition-transform duration-300 group-hover:text-brand-orange">
-                      {service.name}
-                    </h3>
+                    <div className="space-y-1 sm:space-y-2">
+                      <h3 className="text-white font-black text-sm sm:text-xl italic uppercase tracking-tight group-hover:text-brand-orange transition-colors leading-tight line-clamp-1">
+                        {service.name}
+                      </h3>
+                      <p className="hidden sm:block text-white/40 text-[11px] leading-relaxed line-clamp-2 font-medium h-8">
+                        {service.description || "Premium automotive care and professional treatment for your vehicle."}
+                      </p>
+                    </div>
 
-                    {/* Subtle Gradient Glow */}
-                    <div className="absolute inset-0 bg-radial-gradient from-brand-orange/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                    <div className="mt-auto pt-3 sm:pt-5 flex items-center justify-between border-t border-white/5">
+                      <span className="text-[8px] sm:text-[9px] text-white/20 uppercase font-black tracking-[0.2em] group-hover:text-white/40 transition-colors">Book Now</span>
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-brand-orange group-hover:text-black transition-all transform group-hover:scale-110">
+                        <Zap size={14} />
+                      </div>
+                    </div>
+
+                    {/* Radial Glow */}
+                    <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-brand-orange/10 blur-[60px] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                   </motion.div>
                 ))}
               </div>

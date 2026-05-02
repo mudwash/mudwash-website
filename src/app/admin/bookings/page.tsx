@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Search, 
   Filter, 
@@ -13,9 +13,16 @@ import {
   MapPin,
   Calendar,
   Clock,
-  Loader2
+  Loader2,
+  Trash2,
+  User as UserIcon,
+  CheckCircle2,
+  XCircle,
+  Eye,
+  X
 } from "lucide-react";
-import { getBookings, updateBookingStatus, Booking } from "@/lib/bookings";
+import { getBookings, updateBookingStatus, createBooking, deleteBooking, Booking } from "@/lib/bookings";
+import { getServices, Service } from "@/lib/services";
 
 const statusStyles = {
   Completed: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
@@ -27,14 +34,40 @@ export default function BookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [services, setServices] = useState<Service[]>([]);
+  
+  const [formData, setFormData] = useState({
+    customerName: "",
+    email: "",
+    phone: "",
+    service: "",
+    date: "",
+    time: "",
+    location: "",
+    amount: "AED 0",
+    status: "Pending" as Booking["status"]
+  });
 
   const isMountedRef = useRef(true);
 
   useEffect(() => {
     isMountedRef.current = true;
     fetchBookings();
+    fetchServices();
     return () => { isMountedRef.current = false; };
   }, []);
+
+  const fetchServices = async () => {
+    try {
+      const data = await getServices(true);
+      if (isMountedRef.current) setServices(data);
+    } catch (error) {
+      console.error("Error fetching services:", error);
+    }
+  };
 
   const fetchBookings = async () => {
     try {
@@ -62,18 +95,60 @@ export default function BookingsPage() {
     b.service.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this booking?")) return;
+    try {
+      await deleteBooking(id);
+      fetchBookings();
+    } catch (error) {
+      console.error("Error deleting booking:", error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      await createBooking(formData);
+      setIsModalOpen(false);
+      setFormData({
+        customerName: "", email: "", phone: "", service: "",
+        date: "", time: "", location: "", amount: "AED 0", status: "Pending"
+      });
+      fetchBookings();
+    } catch (error) {
+      console.error("Error creating booking:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleServiceChange = (serviceName: string) => {
+    const selected = services.find(s => s.name === serviceName);
+    setFormData({
+      ...formData,
+      service: serviceName,
+      amount: selected ? selected.price : "AED 0"
+    });
+  };
+
   return (
     <div className="space-y-8 pb-12">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Bookings</h1>
+          <h1 className="text-3xl font-bold mb-2 text-white italic uppercase tracking-tighter">Bookings</h1>
           <p className="text-white/40 text-sm font-medium">Manage and monitor all detailing appointments.</p>
         </div>
-        <button className="bg-brand-orange text-black px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-white transition-colors">
-          <Plus size={18} />
-          <span>New Booking</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="bg-brand-orange text-black px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-white transition-colors"
+          >
+            <Plus size={18} />
+            <span>New Booking</span>
+          </button>
+        </div>
       </div>
 
       {/* Filters & Search */}
@@ -101,88 +176,359 @@ export default function BookingsPage() {
       </div>
 
       {/* Bookings List */}
-      <div className="bg-[#0A0A0A] border border-white/5 rounded-2xl overflow-hidden">
+      <div className="bg-[#0A0A0A] border border-white/5 rounded-2xl shadow-2xl pb-40">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="animate-spin text-brand-orange" size={32} />
           </div>
         ) : filteredBookings.length === 0 ? (
           <div className="text-center py-20 text-white/20">
-            <p>No bookings found.</p>
+            <p className="font-bold uppercase tracking-widest text-xs">No bookings found</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="text-white/30 text-[10px] font-bold uppercase tracking-widest border-b border-white/5">
-                  <th className="px-6 py-4">Booking</th>
-                  <th className="px-6 py-4">Customer</th>
-                  <th className="px-6 py-4">Service Details</th>
-                  <th className="px-6 py-4">Location</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4">Amount</th>
-                  <th className="px-6 py-4"></th>
-                </tr>
-              </thead>
-              <tbody className="text-sm">
-                {filteredBookings.map((booking) => (
-                  <tr key={booking.id} className="border-b border-white/5 hover:bg-white/[0.01] transition-colors group">
-                    <td className="px-6 py-6">
-                      <div className="flex flex-col gap-1">
-                        <span className="font-mono text-xs text-brand-orange font-bold uppercase">{booking.id?.slice(-6)}</span>
-                        <div className="flex items-center gap-2 text-white/40 text-[10px]">
-                          <Calendar size={12} />
-                          <span>{booking.date}</span>
-                          <span className="w-1 h-1 rounded-full bg-white/10" />
-                          <Clock size={12} />
-                          <span>{booking.time}</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-6">
-                      <div className="flex flex-col">
-                        <span className="font-bold text-white mb-1">{booking.customerName}</span>
-                        <div className="flex items-center gap-3 text-white/40 text-[10px]">
-                          <span className="flex items-center gap-1"><Mail size={10} /> {booking.email}</span>
-                          <span className="flex items-center gap-1"><Phone size={10} /> {booking.phone}</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-6">
-                      <span className="px-2 py-1 bg-white/5 rounded text-xs font-medium text-white/80">
-                        {booking.service}
-                      </span>
-                    </td>
-                    <td className="px-6 py-6 text-white/50">
-                      <div className="flex items-center gap-1.5 text-xs">
-                        <MapPin size={12} className="text-brand-orange" />
-                        {booking.location}
-                      </div>
-                    </td>
-                    <td className="px-6 py-6">
-                      <select 
-                        value={booking.status}
-                        onChange={(e) => booking.id && handleStatusUpdate(booking.id, e.target.value as any)}
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold border bg-transparent focus:outline-none cursor-pointer ${statusStyles[booking.status]}`}
-                      >
-                        <option value="Pending" className="bg-[#0A0A0A] text-amber-500">Pending</option>
-                        <option value="Completed" className="bg-[#0A0A0A] text-emerald-500">Completed</option>
-                        <option value="Cancelled" className="bg-[#0A0A0A] text-red-500">Cancelled</option>
-                      </select>
-                    </td>
-                    <td className="px-6 py-6 font-bold">{booking.amount}</td>
-                    <td className="px-6 py-6 text-right">
-                      <button className="p-2 hover:bg-white/5 rounded-lg text-white/30 hover:text-white transition-colors">
-                        <MoreVertical size={18} />
-                      </button>
-                    </td>
+          <>
+            {/* Desktop View */}
+            <div className="hidden lg:block overflow-visible">
+              <table className="w-full text-left overflow-visible">
+                <thead>
+                  <tr className="text-white/30 text-[10px] font-black uppercase tracking-[0.2em] border-b border-white/5">
+                    <th className="px-6 py-5">Booking</th>
+                    <th className="px-6 py-5">Customer</th>
+                    <th className="px-6 py-5">Service</th>
+                    <th className="px-6 py-5">Location</th>
+                    <th className="px-6 py-5">Status</th>
+                    <th className="px-6 py-5">Amount</th>
+                    <th className="px-6 py-5 text-right">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="text-sm">
+                  {filteredBookings.map((booking) => (
+                    <tr key={booking.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group overflow-visible">
+                      <td className="px-6 py-6">
+                        <div className="flex flex-col gap-1.5">
+                          <span className="font-black text-[10px] text-brand-orange uppercase tracking-widest">#{booking.id?.slice(-6)}</span>
+                          <div className="flex items-center gap-3 text-white/40 text-[9px] font-black uppercase">
+                            <span className="flex items-center gap-1"><Calendar size={10} /> {booking.date}</span>
+                            <span className="flex items-center gap-1"><Clock size={10} /> {booking.time}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-6">
+                        <div className="flex flex-col">
+                          <span className="font-black text-white italic uppercase tracking-tight mb-1">{booking.customerName}</span>
+                          <div className="flex items-center gap-3 text-white/30 text-[9px] font-bold">
+                            <span className="flex items-center gap-1"><Mail size={10} /> {booking.email}</span>
+                            <span className="flex items-center gap-1 border-l border-white/10 pl-3"><Phone size={10} /> {booking.phone}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-6">
+                        <span className="px-2.5 py-1 bg-white/5 rounded-lg text-[10px] font-black uppercase tracking-wider text-white italic border border-white/5">
+                          {booking.service}
+                        </span>
+                      </td>
+                      <td className="px-6 py-6">
+                        <div className="flex items-center gap-2 text-[10px] font-bold text-white/50 uppercase tracking-wide">
+                          <MapPin size={12} className="text-brand-orange shrink-0" />
+                          {booking.location}
+                        </div>
+                      </td>
+                      <td className="px-6 py-6 overflow-visible">
+                        <select 
+                          value={booking.status}
+                          onChange={(e) => booking.id && handleStatusUpdate(booking.id, e.target.value as any)}
+                          className={`inline-flex items-center px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border bg-transparent focus:outline-none cursor-pointer transition-all ${statusStyles[booking.status]}`}
+                        >
+                          <option value="Pending" className="bg-[#0A0A0A] text-amber-500">Pending</option>
+                          <option value="Completed" className="bg-[#0A0A0A] text-emerald-500">Completed</option>
+                          <option value="Cancelled" className="bg-[#0A0A0A] text-red-500">Cancelled</option>
+                        </select>
+                      </td>
+                      <td className="px-6 py-6 font-black text-brand-orange italic tracking-tighter text-lg">{booking.amount}</td>
+                      <td className="px-6 py-6 text-right overflow-visible">
+                        <div className="relative">
+                          <button 
+                            onClick={() => setActiveDropdown(activeDropdown === booking.id ? null : (booking.id || null))}
+                            className="p-2 hover:bg-white/5 rounded-xl text-white/20 hover:text-white transition-colors"
+                          >
+                            <MoreVertical size={18} />
+                          </button>
+                          
+                          <AnimatePresence>
+                            {activeDropdown === booking.id && (
+                              <>
+                                <div className="fixed inset-0 z-10" onClick={() => setActiveDropdown(null)} />
+                                <motion.div
+                                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                                  exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                  className="absolute right-0 mt-2 w-48 bg-[#111111] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden"
+                                >
+                                  <div className="p-2 flex flex-col">
+                                    <button className="flex items-center gap-3 px-3 py-2.5 hover:bg-white/5 rounded-lg text-xs font-bold text-white/60 hover:text-white transition-all">
+                                      <Eye size={14} /> View Details
+                                    </button>
+                                    <button className="flex items-center gap-3 px-3 py-2.5 hover:bg-white/5 rounded-lg text-xs font-bold text-white/60 hover:text-white transition-all">
+                                      <UserIcon size={14} /> Customer Info
+                                    </button>
+                                    <div className="h-px bg-white/5 my-1" />
+                                    <button 
+                                      onClick={() => booking.id && handleDelete(booking.id)}
+                                      className="flex items-center gap-3 px-3 py-2.5 hover:bg-red-500/10 rounded-lg text-xs font-bold text-red-500 transition-all"
+                                    >
+                                      <Trash2 size={14} /> Delete Booking
+                                    </button>
+                                  </div>
+                                </motion.div>
+                              </>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile View */}
+            <div className="lg:hidden divide-y divide-white/5">
+              {filteredBookings.map((booking) => (
+                <div key={booking.id} className="p-5 space-y-4 hover:bg-white/[0.01] transition-colors">
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-1">
+                      <span className="font-black text-[9px] text-brand-orange uppercase tracking-[0.2em]">#{booking.id?.slice(-6)}</span>
+                      <h3 className="font-black text-white italic uppercase tracking-tight text-lg leading-none">{booking.customerName}</h3>
+                      <div className="flex items-center gap-3 text-white/40 text-[9px] font-bold uppercase mt-1">
+                        <span className="flex items-center gap-1"><Calendar size={10} /> {booking.date}</span>
+                        <span className="flex items-center gap-1 border-l border-white/5 pl-3"><Clock size={10} /> {booking.time}</span>
+                      </div>
+                    </div>
+                    <select 
+                      value={booking.status}
+                      onChange={(e) => booking.id && handleStatusUpdate(booking.id, e.target.value as any)}
+                      className={`px-3 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest border bg-transparent focus:outline-none cursor-pointer transition-all ${statusStyles[booking.status]}`}
+                    >
+                      <option value="Pending" className="bg-[#0A0A0A] text-amber-500">Pending</option>
+                      <option value="Completed" className="bg-[#0A0A0A] text-emerald-500">Completed</option>
+                      <option value="Cancelled" className="bg-[#0A0A0A] text-red-500">Cancelled</option>
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 py-3 border-y border-white/5">
+                    <div className="space-y-1">
+                      <p className="text-[8px] font-black text-white/20 uppercase tracking-widest">Service</p>
+                      <p className="text-[10px] font-black text-white italic uppercase">{booking.service}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[8px] font-black text-white/20 uppercase tracking-widest">Amount</p>
+                      <p className="text-sm font-black text-brand-orange italic">{booking.amount}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1">
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-white/40 uppercase tracking-wide">
+                      <MapPin size={12} className="text-brand-orange shrink-0" />
+                      <span className="line-clamp-1">{booking.location}</span>
+                    </div>
+                    <div className="flex gap-2 relative">
+                      <button className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white/30">
+                        <Phone size={14} />
+                      </button>
+                      <button className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white/30">
+                        <Mail size={14} />
+                      </button>
+                      <button 
+                        onClick={() => setActiveDropdown(activeDropdown === booking.id ? null : (booking.id || null))}
+                        className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white/30"
+                      >
+                        <MoreVertical size={14} />
+                      </button>
+
+                      <AnimatePresence>
+                        {activeDropdown === booking.id && (
+                          <>
+                            <div className="fixed inset-0 z-10" onClick={() => setActiveDropdown(null)} />
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.95, x: 20 }}
+                              animate={{ opacity: 1, scale: 1, x: 0 }}
+                              exit={{ opacity: 0, scale: 0.95, x: 20 }}
+                              className="absolute right-0 bottom-10 w-40 bg-[#111111] border border-white/10 rounded-xl shadow-2xl z-20 overflow-hidden"
+                            >
+                              <div className="p-1 flex flex-col">
+                                <button className="flex items-center gap-2 px-3 py-2 hover:bg-white/5 rounded-lg text-[10px] font-bold text-white/60">
+                                  <Eye size={12} /> View
+                                </button>
+                                <button 
+                                  onClick={() => booking.id && handleDelete(booking.id)}
+                                  className="flex items-center gap-2 px-3 py-2 hover:bg-red-500/10 rounded-lg text-[10px] font-bold text-red-500"
+                                >
+                                  <Trash2 size={12} /> Delete
+                                </button>
+                              </div>
+                            </motion.div>
+                          </>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
+
+      {/* New Booking Modal */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !isSubmitting && setIsModalOpen(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-2xl bg-[#0A0A0A] border border-white/10 rounded-3xl overflow-hidden shadow-2xl"
+            >
+              <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+                <div>
+                  <h2 className="text-xl font-black italic uppercase tracking-tight text-white">Create New Booking</h2>
+                  <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-1">Manual administrative entry</p>
+                </div>
+                <button 
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-2 hover:bg-white/5 rounded-full text-white/20 hover:text-white transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="p-8 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-1">Customer Name</label>
+                    <input 
+                      required
+                      type="text" 
+                      value={formData.customerName}
+                      onChange={(e) => setFormData({...formData, customerName: e.target.value})}
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-orange transition-all font-bold"
+                      placeholder="e.g. Ahmed Khan"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-1">Phone Number</label>
+                    <input 
+                      required
+                      type="tel" 
+                      value={formData.phone}
+                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-orange transition-all font-bold"
+                      placeholder="+971 -- --- ----"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-1">Email Address</label>
+                  <input 
+                    required
+                    type="email" 
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-orange transition-all font-bold text-white/60"
+                    placeholder="customer@example.com"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2 border-t border-white/5 mt-4">
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-1">Select Service</label>
+                    <select 
+                      required
+                      value={formData.service}
+                      onChange={(e) => handleServiceChange(e.target.value)}
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-orange transition-all font-black italic uppercase text-brand-orange"
+                    >
+                      <option value="" className="bg-[#0A0A0A] text-white">Choose a service...</option>
+                      {services.map(s => (
+                        <option key={s.id} value={s.name} className="bg-[#0A0A0A] text-white">{s.name} ({s.price})</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-1">Booking Date</label>
+                    <input 
+                      required
+                      type="date" 
+                      value={formData.date}
+                      onChange={(e) => setFormData({...formData, date: e.target.value})}
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-orange transition-all font-bold uppercase"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-1">Preferred Time</label>
+                    <input 
+                      required
+                      type="time" 
+                      value={formData.time}
+                      onChange={(e) => setFormData({...formData, time: e.target.value})}
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-orange transition-all font-bold"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-1">Service Location</label>
+                  <div className="relative group">
+                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-brand-orange transition-colors" size={16} />
+                    <input 
+                      required
+                      type="text" 
+                      value={formData.location}
+                      onChange={(e) => setFormData({...formData, location: e.target.value})}
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm focus:outline-none focus:border-brand-orange transition-all font-bold"
+                      placeholder="e.g. Al Barsha, Dubai"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-white/5 flex items-center justify-between">
+                  <div>
+                    <p className="text-[9px] font-black text-white/20 uppercase tracking-widest">Total Amount</p>
+                    <p className="text-2xl font-black text-brand-orange italic">{formData.amount}</p>
+                  </div>
+                  <div className="flex gap-4">
+                    <button 
+                      type="button"
+                      onClick={() => setIsModalOpen(false)}
+                      className="px-6 py-3 text-white/40 text-xs font-black uppercase tracking-widest hover:text-white transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="bg-brand-orange text-black px-8 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
+                      {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
+                      {isSubmitting ? "Processing..." : "Confirm Booking"}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
+

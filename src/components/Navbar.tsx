@@ -77,11 +77,13 @@ export default function Navbar() {
 
   const navLinks: NavLink[] = [
     { name: 'Home', href: '/', icon: <Home size={22} /> },
+    { name: 'Services', href: '/services', icon: <Wrench size={22} /> },
     { name: 'Shop', href: '/spare-parts', icon: <ShoppingBag size={22} /> },
     { name: 'Book', href: '/bookings', icon: <Plus size={26} />, isCenter: true },
-    { name: 'Notifications', href: '#', icon: <Bell size={22} /> },
     { name: 'Profile', href: isLoggedIn ? '/profile' : '/sign-up', icon: <User size={22} /> },
   ];
+
+  if (pathname.startsWith('/admin')) return null;
 
   return (
     <>

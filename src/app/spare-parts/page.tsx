@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { Search, Filter, ShoppingCart, Star, Loader2 } from "lucide-react";
 import gsap from "gsap";
-import Navbar from "@/components/Navbar";
+
 import Footer from "@/components/Footer";
 import { auth } from "@/lib/firebase";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -127,7 +127,7 @@ function SparePartsContent() {
 
   return (
     <>
-      <Navbar />
+
       <main
         ref={containerRef}
         className="min-h-screen bg-[#111111] pt-24 sm:pt-32 pb-24 px-4 sm:px-6 md:px-8"

@@ -6,6 +6,7 @@ import Script from 'next/script';
 
 import { AuthProvider } from "@/lib/AuthContext";
 import PWAWrapper from "@/components/PWAWrapper";
+import Navbar from "@/components/Navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -66,6 +67,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <AuthProvider>
           <PWAWrapper />
+          <Navbar />
           {children}
         </AuthProvider>
       </body>
